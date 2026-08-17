@@ -143,9 +143,9 @@ function renderHistory(){
   list.innerHTML=attendanceHistory.map(function(item){
     return `
       <div class="history-card">
-        <div class="history-name">${escapeHtml(item.nama || "Siswa")}</div>
-        <div class="history-nisn">NISN: ${escapeHtml(item.nisn)}</div>
-        <div class="history-time">🕐 ${escapeHtml(item.time)}</div>
+        <div class="history-name">${escapeHtml(item.nama || "Nama tidak ditemukan")}</div>
+        <div class="history-nisn">${escapeHtml(item.kelas || "Kelas belum diketahui")} · NISN: ${escapeHtml(item.nisn)}</div>
+        <div class="history-time">🕐 ${escapeHtml(item.time || "-")}</div>
       </div>`;
   }).join("");
 }
@@ -353,6 +353,62 @@ document.getElementById("back").addEventListener("click",async function(){
   }else{
     window.location.href=APPS_SCRIPT_URL;
   }
+});
+
+
+window.addEventListener("message",function(event){
+  if(!event || !event.data || event.data.type!=="ABSENSI_RESULT") return;
+
+  const data=event.data;
+  const nisn=String(data.nisn||"").trim();
+  if(!nisn)return;
+
+  const item=attendanceHistory.find(function(x){return x.nisn===nisn;});
+
+  if(item){
+    item.nama=data.nama || item.nama || "Nama tidak ditemukan";
+    item.kelas=data.kelas || item.kelas || "";
+    item.time=data.waktu || item.time || "";
+    item.status=data.status || item.status || "";
+    item.message=data.message || item.message || "";
+  }else{
+    attendanceHistory.unshift({
+      nisn:nisn,
+      nama:data.nama || "Nama tidak ditemukan",
+      kelas:data.kelas || "",
+      time:data.waktu || new Date().toLocaleTimeString("id-ID",{
+        hour:"2-digit",minute:"2-digit",second:"2-digit"
+      }),
+      status:data.status || "",
+      message:data.message || ""
+    });
+  }
+
+  saveHistory();
+  renderHistory();
+
+  const resultText=document.getElementById("resultText");
+  if(data.success){
+    resultText.textContent=(data.nama || "Siswa")+" • "+(data.kelas || "Kelas");
+    setStatus(
+      "✓ "+(data.message || "Absensi berhasil dicatat."),
+      "Kamera tetap aktif. Silakan scan siswa berikutnya."
+    );
+  }else if(data.duplicate){
+    resultText.textContent=(data.nama || "Siswa")+" sudah absen";
+    setStatus(
+      "Siswa sudah tercatat",
+      data.message || "Silakan scan siswa berikutnya."
+    );
+  }else{
+    resultText.textContent=data.message || "Absensi gagal";
+    setStatus(
+      "QR terbaca",
+      "Periksa pesan hasil absensi."
+    );
+  }
+
+  processing=false;
 });
 
 window.addEventListener("beforeunload",function(){
