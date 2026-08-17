@@ -3,188 +3,686 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
 <title>Scanner QR Kehadiran</title>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<script
+  src="https://unpkg.com/html5-qrcode"
+  type="text/javascript">
+</script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#0b1220;color:#fff;font-family:Arial,sans-serif;min-height:100vh}
-.wrap{max-width:520px;margin:auto;padding:16px}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-h1{font-size:20px;margin:0}.sub{font-size:12px;color:#94a3b8;margin-top:5px}
-button{border:0;border-radius:10px;padding:11px 15px;font-weight:bold;cursor:pointer}
-#back{background:#1e293b;color:white}
-.card{background:#111827;border:1px solid #334155;border-radius:18px;padding:10px}
-#reader{width:100%}
-#reader video{width:100%!important;border-radius:12px}
-.status{margin-top:14px;text-align:center;padding:14px;background:#111827;border-radius:14px}
-#hint{font-size:12px;color:#94a3b8;margin-top:5px}
-#error{display:none;margin-top:12px;padding:13px;border-radius:12px;background:#451a1a;color:#fecaca}
-#retry{display:none;width:100%;margin-top:10px;background:#dc2626;color:white}
-#result{display:none;margin-top:12px;text-align:center;padding:16px;border-radius:14px;background:#052e1b;border:1px solid #166534}
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  min-height:100vh
+}
+
+.wrap{
+  max-width:520px;
+  margin:auto;
+  padding:16px
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px
+}
+
+h1{
+  font-size:20px;
+  margin:0
+}
+
+.sub{
+  font-size:12px;
+  color:#94a3b8;
+  margin-top:5px
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:11px 15px;
+  font-weight:bold;
+  cursor:pointer
+}
+
+#back{
+  background:#1e293b;
+  color:white
+}
+
+.card{
+  background:#111827;
+  border:1px solid #334155;
+  border-radius:18px;
+  padding:10px
+}
+
+#reader{
+  width:100%
+}
+
+#reader video{
+  width:100%!important;
+  border-radius:12px
+}
+
+.status{
+  margin-top:14px;
+  text-align:center;
+  padding:14px;
+  background:#111827;
+  border-radius:14px
+}
+
+#hint{
+  font-size:12px;
+  color:#94a3b8;
+  margin-top:5px
+}
+
+#error{
+  display:none;
+  margin-top:12px;
+  padding:13px;
+  border-radius:12px;
+  background:#451a1a;
+  color:#fecaca
+}
+
+#retry{
+  display:none;
+  width:100%;
+  margin-top:10px;
+  background:#dc2626;
+  color:white
+}
+
+#result{
+  display:none;
+  margin-top:12px;
+  text-align:center;
+  padding:16px;
+  border-radius:14px;
+  background:#052e1b;
+  border:1px solid #166534
+}
+
+#resultText{
+  font-weight:bold;
+  white-space:pre-line
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
+
   <div class="header">
+
     <div>
       <h1>📷 Scan QR Kehadiran</h1>
-      <div class="sub">Arahkan QR siswa ke kamera</div>
+
+      <div class="sub">
+        Arahkan QR siswa ke kamera
+      </div>
     </div>
-    <button id="back">Kembali</button>
+
+    <button id="back">
+      Kembali
+    </button>
+
   </div>
+
 
   <div class="card">
+
     <div id="reader"></div>
+
   </div>
+
 
   <div class="status">
-    <div id="status">Membuka kamera...</div>
-    <div id="hint">Izinkan akses kamera jika diminta.</div>
+
+    <div id="status">
+      Membuka kamera...
+    </div>
+
+    <div id="hint">
+      Izinkan akses kamera jika diminta.
+    </div>
+
   </div>
+
 
   <div id="error"></div>
-  <button id="retry">Coba Lagi</button>
+
+  <button id="retry">
+    Coba Lagi
+  </button>
+
 
   <div id="result">
-    <div style="font-size:30px">✓</div>
-    <div id="resultText" style="font-weight:bold"></div>
+
+    <div style="font-size:30px">
+      ✓
+    </div>
+
+    <div id="resultText"></div>
+
   </div>
+
 </div>
 
+
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIJwq8jk0XX_1KuYEWzMLJXNxdfLOxAfsSUHc91R1BYH4J_TdnRYWjKrR2Mn55pR8K1Q/exec";
+
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwIJwq8jk0XX_1KuYEWzMLJXNxdfLOxAfsSUHc91R1BYH4J_TdnRYWjKrR2Mn55pR8K1Q/exec";
+
+
 let qrScanner = null;
+
 let processing = false;
 
-function status(text,hint=""){
-  document.getElementById("status").textContent=text;
-  document.getElementById("hint").textContent=hint;
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function status(text, hint = "") {
+
+  document.getElementById("status").textContent = text;
+
+  document.getElementById("hint").textContent = hint;
+
 }
 
-function error(text){
-  const e=document.getElementById("error");
-  e.textContent=text;
-  e.style.display="block";
-  document.getElementById("retry").style.display="block";
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function error(text) {
+
+  const e =
+    document.getElementById("error");
+
+  e.textContent = text;
+
+  e.style.display = "block";
+
+  document.getElementById("retry")
+    .style.display = "block";
+
 }
 
-function clearError(){
-  document.getElementById("error").style.display="none";
-  document.getElementById("retry").style.display="none";
+
+/* =========================================================
+   CLEAR ERROR
+========================================================= */
+
+function clearError() {
+
+  document.getElementById("error")
+    .style.display = "none";
+
+  document.getElementById("retry")
+    .style.display = "none";
+
 }
 
-async function stopScanner(){
-  if(!qrScanner)return;
-  try{await qrScanner.stop()}catch(e){}
-  try{qrScanner.clear()}catch(e){}
-  qrScanner=null;
+
+/* =========================================================
+   STOP SCANNER
+========================================================= */
+
+async function stopScanner() {
+
+  if (!qrScanner) return;
+
+  try {
+
+    await qrScanner.stop();
+
+  } catch (e) {}
+
+  try {
+
+    qrScanner.clear();
+
+  } catch (e) {}
+
+  qrScanner = null;
+
 }
 
-async function startScanner(){
-  processing=false;
+
+/* =========================================================
+   START SCANNER
+========================================================= */
+
+async function startScanner() {
+
+  processing = false;
+
   clearError();
-  document.getElementById("result").style.display="none";
-  status("Membuka kamera...","Izinkan akses kamera jika diminta.");
+
+  document.getElementById("result")
+    .style.display = "none";
+
+  status(
+    "Membuka kamera...",
+    "Izinkan akses kamera jika diminta."
+  );
+
   await stopScanner();
 
-  if(typeof Html5Qrcode==="undefined"){
-    error("Library scanner gagal dimuat. Pastikan koneksi internet aktif.");
+
+  if (typeof Html5Qrcode === "undefined") {
+
+    error(
+      "Library scanner gagal dimuat. Pastikan koneksi internet aktif."
+    );
+
     return;
+
   }
 
-  qrScanner=new Html5Qrcode("reader");
 
-  const config={
-    fps:10,
-    qrbox:(w,h)=>{
-      const s=Math.max(180,Math.floor(Math.min(w,h)*0.7));
-      return {width:s,height:s};
+  qrScanner =
+    new Html5Qrcode("reader");
+
+
+  const config = {
+
+    fps: 10,
+
+    qrbox: (w, h) => {
+
+      const s =
+        Math.max(
+          180,
+          Math.floor(
+            Math.min(w, h) * 0.7
+          )
+        );
+
+      return {
+        width: s,
+        height: s
+      };
+
     }
+
   };
 
-  try{
+
+  try {
+
     await qrScanner.start(
-      {facingMode:"environment"},
+
+      {
+        facingMode: "environment"
+      },
+
       config,
+
       onScan,
-      ()=>{}
+
+      () => {}
+
     );
-    status("Kamera siap","Arahkan QR siswa ke kotak scanner.");
-  }catch(first){
-    try{
-      const cams=await Html5Qrcode.getCameras();
-      if(!cams.length)throw new Error("Kamera tidak ditemukan");
-      await qrScanner.start(cams[0].id,config,onScan,()=>{});
-      status("Kamera siap","Arahkan QR siswa ke kotak scanner.");
-    }catch(err){
-      const msg=String(err?.message||err||"");
-      if(/NotAllowed|Permission/i.test(msg))
-        error("Akses kamera ditolak. Izinkan kamera untuk halaman ini lalu tekan Coba Lagi.");
-      else if(/NotFound/i.test(msg))
-        error("Kamera tidak ditemukan pada perangkat.");
-      else
-        error("Kamera tidak dapat dibuka. Pastikan halaman dibuka melalui HTTPS.");
+
+
+    status(
+      "Kamera siap",
+      "Arahkan QR siswa ke kotak scanner."
+    );
+
+
+  } catch (first) {
+
+    try {
+
+      const cams =
+        await Html5Qrcode.getCameras();
+
+
+      if (!cams.length) {
+
+        throw new Error(
+          "Kamera tidak ditemukan"
+        );
+
+      }
+
+
+      await qrScanner.start(
+
+        cams[0].id,
+
+        config,
+
+        onScan,
+
+        () => {}
+
+      );
+
+
+      status(
+        "Kamera siap",
+        "Arahkan QR siswa ke kotak scanner."
+      );
+
+
+    } catch (err) {
+
+      const msg =
+        String(
+          err?.message ||
+          err ||
+          ""
+        );
+
+
+      if (
+        /NotAllowed|Permission/i
+          .test(msg)
+      ) {
+
+        error(
+          "Akses kamera ditolak. Izinkan kamera untuk halaman ini lalu tekan Coba Lagi."
+        );
+
+      }
+
+      else if (
+        /NotFound/i.test(msg)
+      ) {
+
+        error(
+          "Kamera tidak ditemukan pada perangkat."
+        );
+
+      }
+
+      else {
+
+        error(
+          "Kamera tidak dapat dibuka. Pastikan halaman dibuka melalui HTTPS."
+        );
+
+      }
+
     }
+
   }
+
 }
 
-function getNisn(raw){
-  const text=String(raw||"").trim();
-  if(!text)return "";
-  try{
-    const u=new URL(text);
-    return (u.searchParams.get("nisn")||u.searchParams.get("NISN")||text).trim();
-  }catch(e){
+
+/* =========================================================
+   AMBIL NISN DARI HASIL QR
+========================================================= */
+
+function getNisn(raw) {
+
+  const text =
+    String(raw || "").trim();
+
+
+  if (!text) return "";
+
+
+  try {
+
+    const u =
+      new URL(text);
+
+
+    return (
+
+      u.searchParams.get("nisn") ||
+
+      u.searchParams.get("NISN") ||
+
+      text
+
+    ).trim();
+
+
+  } catch (e) {
+
     return text;
+
   }
+
 }
 
-async function onScan(decodedText){
-  if(processing)return;
 
-  const nisn=getNisn(decodedText);
-  if(!nisn)return;
+/* =========================================================
+   QR BERHASIL DIBACA
+========================================================= */
 
-  processing=true;
-  status("QR berhasil dibaca","Mencatat kehadiran...");
+async function onScan(decodedText) {
+
+  if (processing) return;
+
+
+  const nisn =
+    getNisn(decodedText);
+
+
+  if (!nisn) return;
+
+
+  processing = true;
+
+
+  status(
+    "QR berhasil dibaca",
+    "Mengirim data ke aplikasi..."
+  );
+
+
   await stopScanner();
 
-  /*
-   * Code.gs Anda sudah memiliki doGet(e):
-   * ?nisn=...&status=Hadir
-   *
-   * Kita navigasikan langsung ke Web App agar tidak terkena
-   * masalah CORS. Setelah backend selesai, pengguna bisa kembali.
-   */
-  document.getElementById("result").style.display="block";
-  document.getElementById("resultText").textContent="NISN terbaca: "+nisn;
 
-  // Kirim NISN kembali ke index utama yang membuka scanner.
-  // Index utama tetap yang memanggil google.script.run ke Code.gs.
-  if (window.opener && !window.opener.closed) {
-    window.opener.postMessage(
-      { type: "attendance_qr", nisn: nisn },
-      "*"
+  /* =====================================================
+     TAMPILKAN HASIL DI SCANNER
+  ===================================================== */
+
+  document.getElementById("result")
+    .style.display = "block";
+
+
+  document.getElementById("resultText")
+    .textContent =
+      "NISN terbaca: " + nisn +
+      "\n\nMengirim ke aplikasi absensi...";
+
+
+  /* =====================================================
+     KIRIM KE INDEX.HTML
+     
+     INI BAGIAN YANG DIPERBAIKI
+     
+     SEBELUM:
+       type: "attendance_qr"
+       nisn: nisn
+
+     SEKARANG:
+       type: "ABSENSI_QR"
+       value: nisn
+
+     HARUS SAMA DENGAN YANG DITUNGGU INDEX.HTML
+  ===================================================== */
+
+  if (
+    window.opener &&
+    !window.opener.closed
+  ) {
+
+    try {
+
+      window.opener.postMessage(
+
+        {
+          type: "ABSENSI_QR",
+          value: nisn
+        },
+
+        "*"
+
+      );
+
+
+      status(
+        "QR berhasil dikirim",
+        "Menunggu aplikasi mencatat absensi..."
+      );
+
+
+      document.getElementById("resultText")
+        .textContent =
+          "NISN: " + nisn +
+          "\n\n✓ Data dikirim ke aplikasi absensi.";
+
+
+      /*
+       * JANGAN langsung menutup popup.
+       *
+       * Kita beri waktu supaya index.html
+       * menerima pesan dan memanggil Code.gs.
+       */
+
+      setTimeout(() => {
+
+        try {
+
+          if (
+            window.opener &&
+            !window.opener.closed
+          ) {
+
+            window.close();
+
+          }
+
+        } catch (e) {}
+
+      }, 1500);
+
+
+    } catch (e) {
+
+      document.getElementById("resultText")
+        .textContent =
+          "NISN: " + nisn +
+          "\n\nGagal mengirim ke aplikasi.";
+
+      error(
+        "Scanner berhasil membaca QR, tetapi gagal mengirim hasil ke aplikasi utama."
+      );
+
+      processing = false;
+
+    }
+
+  }
+
+  else {
+
+    /*
+     * Scanner dibuka langsung tanpa
+     * window.opener.
+     *
+     * Untuk kondisi ini kita beri
+     * pemberitahuan yang jelas.
+     */
+
+    document.getElementById("resultText")
+      .textContent =
+        "NISN: " + nisn +
+        "\n\nScanner tidak terhubung dengan aplikasi utama.";
+
+    error(
+      "Jendela aplikasi utama tidak ditemukan. Buka scanner dari tombol Scan QR di aplikasi absensi."
     );
-    setTimeout(() => window.close(), 700);
-  } else {
-    // Fallback jika scanner dibuka langsung.
-    const url=APPS_SCRIPT_URL+
-      "?nisn="+encodeURIComponent(nisn)+
-      "&status="+encodeURIComponent("Hadir");
-    setTimeout(()=>{ window.location.href=url; },700);
+
+    processing = false;
+
   }
+
 }
 
-document.getElementById("retry").onclick=startScanner;
 
-document.getElementById("back").onclick=async()=>{
-  await stopScanner();
-  history.length>1 ? history.back() : window.location.href=APPS_SCRIPT_URL;
-};
+/* =========================================================
+   TOMBOL RETRY
+========================================================= */
 
-window.addEventListener("beforeunload",stopScanner);
+document
+  .getElementById("retry")
+  .onclick = startScanner;
+
+
+/* =========================================================
+   TOMBOL KEMBALI
+========================================================= */
+
+document
+  .getElementById("back")
+  .onclick = async () => {
+
+    await stopScanner();
+
+
+    if (history.length > 1) {
+
+      history.back();
+
+    }
+
+    else {
+
+      window.location.href =
+        APPS_SCRIPT_URL;
+
+    }
+
+  };
+
+
+/* =========================================================
+   SEBELUM HALAMAN DITUTUP
+========================================================= */
+
+window.addEventListener(
+  "beforeunload",
+  stopScanner
+);
+
+
+/* =========================================================
+   MULAI KAMERA
+========================================================= */
+
 startScanner();
+
 </script>
+
 </body>
 </html>
