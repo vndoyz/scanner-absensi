@@ -1,434 +1,283 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
-
-    <title>Scanner Absensi - SDN 8 Mentok</title>
-
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-        }
-
-        body {
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #080b12,
-                    #111827
-                );
-
-            color: #ffffff;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 520px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-
-        /* =========================
-           HEADER
-        ========================= */
-
-        .header {
-            text-align: center;
-            margin-bottom: 14px;
-        }
-
-        .title {
-            font-size: 21px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .subtitle {
-            margin-top: 5px;
-            color: #94a3b8;
-            font-size: 12px;
-        }
-
-        /* =========================
-           SCANNER
-        ========================= */
-
-        .scanner-card {
-            background: #0f172a;
-
-            border:
-                1px solid
-                rgba(255,255,255,.08);
-
-            border-radius: 18px;
-
-            padding: 10px;
-
-            box-shadow:
-                0 15px 40px
-                rgba(0,0,0,.35);
-
-            overflow: hidden;
-        }
-
-        #reader {
-            width: 100%;
-        }
-
-        #reader video {
-            width: 100% !important;
-            height: auto !important;
-            border-radius: 12px !important;
-            object-fit: cover;
-        }
-
-        #reader__scan_region {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        #reader__dashboard {
-            padding-top: 8px !important;
-        }
-
-        #reader__dashboard button {
-            background:
-                linear-gradient(
-                    135deg,
-                    #dc2626,
-                    #2563eb
-                ) !important;
-
-            color: #fff !important;
-
-            border: none !important;
-
-            border-radius: 9px !important;
-
-            padding: 9px 12px !important;
-
-            font-weight: 700 !important;
-        }
-
-        #reader__dashboard select {
-            background: #111827 !important;
-            color: #fff !important;
-
-            border:
-                1px solid
-                rgba(255,255,255,.15) !important;
-
-            border-radius: 8px !important;
-        }
-
-        /* =========================
-           STATUS
-        ========================= */
-
-        .status-card {
-            margin-top: 12px;
-
-            padding: 12px;
-
-            border-radius: 14px;
-
-            text-align: center;
-
-            background: #0f172a;
-
-            border:
-                1px solid
-                rgba(255,255,255,.08);
-        }
-
-        #status {
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        #statusDetail {
-            margin-top: 4px;
-
-            font-size: 11px;
-
-            color: #94a3b8;
-        }
-
-        /* =========================
-           HASIL SCAN
-        ========================= */
-
-        .result {
-            display: none;
-
-            margin-top: 12px;
-
-            padding: 15px;
-
-            border-radius: 15px;
-
-            text-align: center;
-
-            background: #0f172a;
-
-            border:
-                1px solid
-                rgba(34,197,94,.35);
-        }
-
-        .result.warning {
-            border-color:
-                rgba(245,158,11,.45);
-        }
-
-        .result.error {
-            border-color:
-                rgba(239,68,68,.45);
-        }
-
-        .result-icon {
-            font-size: 30px;
-            margin-bottom: 5px;
-        }
-
-        .result-name {
-            font-size: 17px;
-            font-weight: 800;
-            line-height: 1.35;
-        }
-
-        .result-class {
-            margin-top: 4px;
-            font-size: 12px;
-            color: #cbd5e1;
-        }
-
-        .result-time {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .result-message {
-            margin-top: 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        /* =========================
-           HISTORY
-        ========================= */
-
-        .history-card {
-            margin-top: 12px;
-
-            background: #0f172a;
-
-            border:
-                1px solid
-                rgba(255,255,255,.08);
-
-            border-radius: 16px;
-
-            padding: 12px;
-        }
-
-        .history-header {
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            margin-bottom: 9px;
-        }
-
-        .history-title {
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .history-count {
-            color: #94a3b8;
-            font-size: 10px;
-        }
-
-        #history {
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 8px;
-
-            max-height: 300px;
-
-            overflow-y: auto;
-        }
-
-        .history-item {
-            padding: 10px;
-
-            border-radius: 11px;
-
-            background:
-                rgba(255,255,255,.035);
-
-            border:
-                1px solid
-                rgba(255,255,255,.06);
-        }
-
-        .history-item.duplicate {
-            border-color:
-                rgba(245,158,11,.35);
-        }
-
-        .history-name {
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .history-class {
-            margin-top: 3px;
-            font-size: 10px;
-            color: #cbd5e1;
-        }
-
-        .history-info {
-            margin-top: 3px;
-            font-size: 10px;
-            color: #94a3b8;
-        }
-
-        .history-status {
-            display: inline-block;
-
-            margin-top: 6px;
-
-            padding:
-                3px 7px;
-
-            border-radius: 6px;
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            background:
-                rgba(34,197,94,.12);
-
-            color:
-                #86efac;
-        }
-
-        .history-item.duplicate
-        .history-status {
-
-            background:
-                rgba(245,158,11,.12);
-
-            color:
-                #fcd34d;
-        }
-
-        .empty {
-            text-align: center;
-
-            color: #64748b;
-
-            padding: 16px;
-
-            font-size: 11px;
-        }
-
-        /* =========================
-           ERROR
-        ========================= */
-
-        #error {
-            display: none;
-
-            margin-top: 10px;
-
-            padding: 10px;
-
-            border-radius: 10px;
-
-            background:
-                rgba(127,29,29,.35);
-
-            border:
-                1px solid
-                rgba(248,113,113,.25);
-
-            color: #fecaca;
-
-            font-size: 11px;
-
-            text-align: center;
-        }
-
-        #retry {
-            display: none;
-
-            width: 100%;
-
-            margin-top: 8px;
-
-            padding: 11px;
-
-            color: #fff;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #dc2626,
-                    #2563eb
-                );
-        }
-
-        @media(max-width:380px) {
-
-            .container {
-                padding: 10px;
-            }
-
-            .title {
-                font-size: 19px;
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<title>Scanner Absensi - SDN 8 Mentok</title>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        linear-gradient(
+            135deg,
+            #05060a,
+            #111827
+        );
+    color:#fff;
+}
+
+.container{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+    padding:14px;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:12px;
+}
+
+.title{
+    font-size:21px;
+    font-weight:800;
+}
+
+.subtitle{
+    color:#94a3b8;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.card{
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:9px;
+    box-shadow:0 15px 35px rgba(0,0,0,.35);
+}
+
+#reader{
+    width:100%;
+}
+
+#reader video{
+    width:100%!important;
+    height:auto!important;
+    border-radius:12px!important;
+    object-fit:cover;
+}
+
+#reader__dashboard{
+    padding-top:8px!important;
+}
+
+#reader__dashboard button{
+    background:
+        linear-gradient(
+            135deg,
+            #dc2626,
+            #2563eb
+        )!important;
+
+    color:#fff!important;
+    border:0!important;
+    border-radius:8px!important;
+    font-weight:700!important;
+}
+
+#reader__dashboard select{
+    background:#111827!important;
+    color:#fff!important;
+    border-radius:8px!important;
+}
+
+.status{
+    margin-top:10px;
+    padding:12px;
+    border-radius:13px;
+    text-align:center;
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+#status{
+    font-size:13px;
+    font-weight:800;
+}
+
+#detail{
+    margin-top:4px;
+    color:#94a3b8;
+    font-size:10px;
+}
+
+.result{
+    display:none;
+    margin-top:10px;
+    padding:15px;
+    text-align:center;
+    border-radius:14px;
+    background:#0f172a;
+    border:1px solid rgba(34,197,94,.35);
+}
+
+.result.warning{
+    border-color:rgba(245,158,11,.45);
+}
+
+.result.error{
+    border-color:rgba(239,68,68,.45);
+}
+
+.icon{
+    font-size:30px;
+}
+
+.name{
+    margin-top:4px;
+    font-size:17px;
+    font-weight:800;
+}
+
+.class{
+    margin-top:3px;
+    font-size:12px;
+    color:#cbd5e1;
+}
+
+.time{
+    margin-top:4px;
+    font-size:11px;
+    color:#94a3b8;
+}
+
+.message{
+    margin-top:8px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.history{
+    margin-top:10px;
+    padding:11px;
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+}
+
+.history-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+}
+
+.history-title{
+    font-size:14px;
+    font-weight:800;
+}
+
+.history-count{
+    font-size:10px;
+    color:#94a3b8;
+}
+
+#historyList{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    max-height:300px;
+    overflow-y:auto;
+}
+
+.history-item{
+    padding:9px;
+    border-radius:10px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.06);
+}
+
+.history-item.duplicate{
+    border-color:rgba(245,158,11,.35);
+}
+
+.history-name{
+    font-size:12px;
+    font-weight:800;
+}
+
+.history-class,
+.history-info{
+    margin-top:3px;
+    font-size:10px;
+    color:#94a3b8;
+}
+
+.badge{
+    display:inline-block;
+    margin-top:5px;
+    padding:3px 6px;
+    border-radius:5px;
+    font-size:9px;
+    font-weight:800;
+    background:rgba(34,197,94,.12);
+    color:#86efac;
+}
+
+.duplicate .badge{
+    background:rgba(245,158,11,.12);
+    color:#fcd34d;
+}
+
+.empty{
+    text-align:center;
+    padding:15px;
+    color:#64748b;
+    font-size:11px;
+}
+
+#error{
+    display:none;
+    margin-top:8px;
+    padding:9px;
+    border-radius:9px;
+    text-align:center;
+    font-size:11px;
+    color:#fecaca;
+    background:rgba(127,29,29,.35);
+    border:1px solid rgba(248,113,113,.25);
+}
+
+#retry{
+    display:none;
+    width:100%;
+    margin-top:7px;
+    padding:10px;
+    border:0;
+    border-radius:9px;
+    color:#fff;
+    font-weight:700;
+    background:linear-gradient(135deg,#dc2626,#2563eb);
+}
+
+</style>
 </head>
-
 
 <body>
 
 <div class="container">
-
-    <!-- HEADER -->
 
     <div class="header">
 
@@ -443,43 +292,32 @@
     </div>
 
 
-    <!-- SCANNER -->
-
-    <div class="scanner-card">
+    <div class="card">
 
         <div id="reader"></div>
 
     </div>
 
 
-    <!-- STATUS -->
-
-    <div class="status-card">
+    <div class="status">
 
         <div id="status">
             Menyiapkan kamera...
         </div>
 
-        <div id="statusDetail">
+        <div id="detail">
             Mohon izinkan akses kamera.
         </div>
 
     </div>
 
 
-    <!-- ERROR -->
-
     <div id="error"></div>
 
-    <button
-        id="retry"
-        type="button"
-    >
+    <button id="retry">
         Coba Lagi
     </button>
 
-
-    <!-- HASIL -->
 
     <div
         id="result"
@@ -488,37 +326,35 @@
 
         <div
             id="resultIcon"
-            class="result-icon"
+            class="icon"
         >
             ✓
         </div>
 
         <div
             id="resultName"
-            class="result-name"
+            class="name"
         ></div>
 
         <div
             id="resultClass"
-            class="result-class"
+            class="class"
         ></div>
 
         <div
             id="resultTime"
-            class="result-time"
+            class="time"
         ></div>
 
         <div
             id="resultMessage"
-            class="result-message"
+            class="message"
         ></div>
 
     </div>
 
 
-    <!-- HISTORY -->
-
-    <div class="history-card">
+    <div class="history">
 
         <div class="history-header">
 
@@ -535,13 +371,7 @@
 
         </div>
 
-        <div id="history">
-
-            <div class="empty">
-                Belum ada absensi hari ini.
-            </div>
-
-        </div>
+        <div id="historyList"></div>
 
     </div>
 
@@ -550,27 +380,33 @@
 
 <script>
 
-/* ============================================================
+/* ==========================================================
    VARIABEL
-============================================================ */
+========================================================== */
 
-let scanner = null;
+let qrScanner = null;
 
-let sedangMemproses = false;
+let processing = false;
+
+let lastNisn = "";
+
+let lastSendTime = 0;
+
+let waitingTimer = null;
 
 
-/* ============================================================
+/* ==========================================================
    STORAGE
-============================================================ */
+========================================================== */
 
-function getTanggalKey() {
+function todayKey(){
 
     const d = new Date();
 
     return (
         d.getFullYear() +
         "-" +
-        String(d.getMonth() + 1).padStart(2,"0") +
+        String(d.getMonth()+1).padStart(2,"0") +
         "-" +
         String(d.getDate()).padStart(2,"0")
     );
@@ -579,57 +415,44 @@ function getTanggalKey() {
 
 
 const STORAGE_KEY =
-    "absensi_hari_ini_" +
-    getTanggalKey();
+    "absensi_scanner_" +
+    todayKey();
 
 
-let history =
-    loadHistory();
+let history = loadHistory();
 
 
-/* ============================================================
-   LOAD HISTORY
-============================================================ */
+function loadHistory(){
 
-function loadHistory() {
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
-
-        if (!raw) {
-            return [];
-        }
+    try{
 
         const data =
-            JSON.parse(raw);
+            JSON.parse(
+                localStorage.getItem(
+                    STORAGE_KEY
+                ) || "[]"
+            );
 
-        if (!Array.isArray(data)) {
+
+        if(!Array.isArray(data)){
             return [];
         }
 
+
         /*
-         * Bersihkan data lama yang memakai
-         * nama placeholder "Siswa".
+         * Hapus data lama yang masih memakai
+         * nama "Siswa".
          */
 
         return data.filter(
             item =>
                 item &&
+                item.nisn &&
                 item.nama &&
-                item.nama !== "Siswa" &&
-                item.nisn
+                item.nama !== "Siswa"
         );
 
-    } catch (e) {
-
-        console.error(
-            "Gagal membaca history:",
-            e
-        );
+    }catch(e){
 
         return [];
 
@@ -638,59 +461,44 @@ function loadHistory() {
 }
 
 
-/* ============================================================
-   SAVE HISTORY
-============================================================ */
+function saveHistory(){
 
-function saveHistory() {
-
-    try {
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(history)
-        );
-
-    } catch (e) {
-
-        console.error(
-            "Gagal menyimpan history:",
-            e
-        );
-
-    }
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(history)
+    );
 
 }
 
 
-/* ============================================================
-   ESCAPE HTML
-============================================================ */
+/* ==========================================================
+   ESCAPE
+========================================================== */
 
-function escapeHtml(value) {
+function esc(value){
 
     const div =
         document.createElement("div");
 
     div.textContent =
         value == null
-            ? ""
-            : String(value);
+        ? ""
+        : String(value);
 
     return div.innerHTML;
 
 }
 
 
-/* ============================================================
-   RENDER HISTORY
-============================================================ */
+/* ==========================================================
+   HISTORY
+========================================================== */
 
-function renderHistory() {
+function renderHistory(){
 
-    const container =
+    const list =
         document.getElementById(
-            "history"
+            "historyList"
         );
 
     const count =
@@ -704,9 +512,9 @@ function renderHistory() {
         " siswa";
 
 
-    if (!history.length) {
+    if(history.length === 0){
 
-        container.innerHTML =
+        list.innerHTML =
             `
             <div class="empty">
                 Belum ada absensi hari ini.
@@ -718,286 +526,55 @@ function renderHistory() {
     }
 
 
-    container.innerHTML =
-        history
-            .map(item => {
+    list.innerHTML =
+        history.map(item => {
 
-                const duplicate =
-                    item.duplicate === true;
+            return `
+                <div
+                    class="history-item
+                    ${item.duplicate ? "duplicate" : ""}"
+                >
 
-
-                return `
-                    <div
-                        class="history-item
-                        ${duplicate ? "duplicate" : ""}"
-                    >
-
-                        <div class="history-name">
-                            ${escapeHtml(
-                                item.nama
-                            )}
-                        </div>
-
-                        <div class="history-class">
-                            ${escapeHtml(
-                                item.kelas ||
-                                "Kelas belum diketahui"
-                            )}
-                        </div>
-
-                        <div class="history-info">
-                            NISN:
-                            ${escapeHtml(
-                                item.nisn
-                            )}
-                        </div>
-
-                        <div class="history-info">
-                            🕐
-                            ${escapeHtml(
-                                item.waktu ||
-                                "-"
-                            )}
-                        </div>
-
-                        <div class="history-status">
-                            ${
-                                duplicate
-                                ? "⚠ SUDAH ABSEN"
-                                : "✓ HADIR"
-                            }
-                        </div>
-
+                    <div class="history-name">
+                        ${esc(item.nama)}
                     </div>
-                `;
 
-            })
-            .join("");
+                    <div class="history-class">
+                        ${esc(item.kelas || "")}
+                    </div>
 
-}
+                    <div class="history-info">
+                        NISN: ${esc(item.nisn)}
+                    </div>
 
+                    <div class="history-info">
+                        🕐 ${esc(item.waktu || "-")}
+                    </div>
 
-/* ============================================================
-   SIMPAN HASIL ABSENSI
-============================================================ */
+                    <span class="badge">
+                        ${
+                            item.duplicate
+                            ? "⚠ SUDAH ABSEN"
+                            : "✓ HADIR"
+                        }
+                    </span>
 
-function saveAttendanceResult(data) {
+                </div>
+            `;
 
-    if (!data) {
-        return;
-    }
-
-
-    const nisn =
-        String(
-            data.nisn || ""
-        ).trim();
-
-
-    const nama =
-        String(
-            data.nama || ""
-        ).trim();
-
-
-    /*
-     * JANGAN memasukkan data kalau
-     * nama kosong.
-     *
-     * Ini yang mencegah kartu "Siswa".
-     */
-
-    if (!nisn || !nama) {
-
-        console.warn(
-            "Hasil absensi tidak lengkap:",
-            data
-        );
-
-        return;
-
-    }
-
-
-    const record = {
-
-        nisn: nisn,
-
-        nama: nama,
-
-        kelas:
-            String(
-                data.kelas || ""
-            ).trim(),
-
-        waktu:
-            String(
-                data.waktu || ""
-            ).trim(),
-
-        status:
-            data.status ||
-            "Hadir",
-
-        message:
-            data.message ||
-            "",
-
-        duplicate:
-            !!data.duplicate
-
-    };
-
-
-    /*
-     * Cari siswa berdasarkan NISN.
-     */
-
-    const index =
-        history.findIndex(
-            item =>
-                String(item.nisn) ===
-                nisn
-        );
-
-
-    if (index >= 0) {
-
-        /*
-         * Kalau sudah ada, update.
-         */
-
-        history[index] =
-            record;
-
-    } else {
-
-        /*
-         * Kalau belum ada, masukkan
-         * nama asli dari database.
-         */
-
-        history.unshift(
-            record
-        );
-
-    }
-
-
-    saveHistory();
-
-    renderHistory();
+        }).join("");
 
 }
 
 
-/* ============================================================
-   TAMPILKAN HASIL
-============================================================ */
-
-function showResult(data) {
-
-    const result =
-        document.getElementById(
-            "result"
-        );
-
-    const icon =
-        document.getElementById(
-            "resultIcon"
-        );
-
-    const name =
-        document.getElementById(
-            "resultName"
-        );
-
-    const kelas =
-        document.getElementById(
-            "resultClass"
-        );
-
-    const waktu =
-        document.getElementById(
-            "resultTime"
-        );
-
-    const message =
-        document.getElementById(
-            "resultMessage"
-        );
-
-
-    result.className =
-        "result";
-
-
-    if (data.duplicate) {
-
-        result.classList.add(
-            "warning"
-        );
-
-        icon.textContent =
-            "⚠";
-
-    } else if (!data.success) {
-
-        result.classList.add(
-            "error"
-        );
-
-        icon.textContent =
-            "✕";
-
-    } else {
-
-        icon.textContent =
-            "✓";
-
-    }
-
-
-    name.textContent =
-        data.nama ||
-        "Nama siswa tidak ditemukan";
-
-
-    kelas.textContent =
-        data.kelas
-            ? "Kelas " + data.kelas
-            : "";
-
-
-    waktu.textContent =
-        data.waktu
-            ? "🕐 " + data.waktu
-            : "";
-
-
-    message.textContent =
-        data.message ||
-        (
-            data.success
-                ? "Absensi berhasil."
-                : "Absensi gagal."
-        );
-
-
-    result.style.display =
-        "block";
-
-}
-
-
-/* ============================================================
+/* ==========================================================
    STATUS
-============================================================ */
+========================================================== */
 
 function setStatus(
     text,
     detail
-) {
+){
 
     document.getElementById(
         "status"
@@ -1006,30 +583,28 @@ function setStatus(
 
 
     document.getElementById(
-        "statusDetail"
+        "detail"
     ).textContent =
         detail || "";
 
 }
 
 
-/* ============================================================
+/* ==========================================================
    ERROR
-============================================================ */
+========================================================== */
 
-function showError(message) {
+function showError(text){
 
-    const error =
+    const el =
         document.getElementById(
             "error"
         );
 
+    el.textContent =
+        text;
 
-    error.textContent =
-        message;
-
-
-    error.style.display =
+    el.style.display =
         "block";
 
 
@@ -1041,7 +616,7 @@ function showError(message) {
 }
 
 
-function clearError() {
+function clearError(){
 
     document.getElementById(
         "error"
@@ -1057,54 +632,210 @@ function clearError() {
 }
 
 
-/* ============================================================
-   AMBIL NISN DARI QR
-============================================================ */
+/* ==========================================================
+   RESULT
+========================================================== */
 
-function extractNisn(decodedText) {
+function showResult(data){
 
-    const text =
-        String(
-            decodedText || ""
-        ).trim();
+    const box =
+        document.getElementById(
+            "result"
+        );
 
 
-    if (!text) {
+    box.className =
+        "result";
+
+
+    const icon =
+        document.getElementById(
+            "resultIcon"
+        );
+
+
+    if(data.duplicate){
+
+        box.classList.add(
+            "warning"
+        );
+
+        icon.textContent =
+            "⚠";
+
+    }
+    else if(!data.success){
+
+        box.classList.add(
+            "error"
+        );
+
+        icon.textContent =
+            "✕";
+
+    }
+    else{
+
+        icon.textContent =
+            "✓";
+
+    }
+
+
+    document.getElementById(
+        "resultName"
+    ).textContent =
+        data.nama ||
+        "Nama siswa tidak ditemukan";
+
+
+    document.getElementById(
+        "resultClass"
+    ).textContent =
+        data.kelas
+        ? "Kelas " + data.kelas
+        : "";
+
+
+    document.getElementById(
+        "resultTime"
+    ).textContent =
+        data.waktu
+        ? "🕐 " + data.waktu
+        : "";
+
+
+    document.getElementById(
+        "resultMessage"
+    ).textContent =
+        data.message ||
+        "";
+
+
+    box.style.display =
+        "block";
+
+}
+
+
+/* ==========================================================
+   SIMPAN HASIL
+========================================================== */
+
+function saveResult(data){
+
+    /*
+     * Nama WAJIB ada.
+     *
+     * Kalau tidak ada nama,
+     * jangan simpan.
+     */
+
+    if(
+        !data ||
+        !data.nisn ||
+        !data.nama ||
+        String(data.nama).trim() === ""
+    ){
+
+        return;
+
+    }
+
+
+    const nisn =
+        String(data.nisn).trim();
+
+
+    const record = {
+
+        nisn: nisn,
+
+        nama:
+            String(data.nama).trim(),
+
+        kelas:
+            String(data.kelas || "").trim(),
+
+        waktu:
+            String(data.waktu || "").trim(),
+
+        status:
+            data.status || "Hadir",
+
+        message:
+            data.message || "",
+
+        duplicate:
+            !!data.duplicate
+
+    };
+
+
+    const index =
+        history.findIndex(
+            item =>
+                String(item.nisn) ===
+                nisn
+        );
+
+
+    if(index >= 0){
+
+        history[index] =
+            record;
+
+    }else{
+
+        history.unshift(
+            record
+        );
+
+    }
+
+
+    saveHistory();
+
+    renderHistory();
+
+}
+
+
+/* ==========================================================
+   AMBIL NISN
+========================================================== */
+
+function getNisn(text){
+
+    text =
+        String(text || "").trim();
+
+
+    if(!text){
         return "";
     }
 
 
-    /*
-     * Kalau QR berisi URL:
-     *
-     * https://...?...nisn=123
-     *
-     * ambil parameter nisn.
-     */
-
-    try {
+    try{
 
         const url =
             new URL(text);
 
 
         const nisn =
-            url.searchParams.get("nisn") ||
-            url.searchParams.get("NISN");
+            url.searchParams.get(
+                "nisn"
+            ) ||
+            url.searchParams.get(
+                "NISN"
+            );
 
 
-        if (nisn) {
+        if(nisn){
             return nisn.trim();
         }
 
-    } catch (e) {
-
-        /*
-         * Kalau bukan URL,
-         * anggap langsung sebagai NISN.
-         */
-
-    }
+    }catch(e){}
 
 
     return text;
@@ -1112,34 +843,141 @@ function extractNisn(decodedText) {
 }
 
 
-/* ============================================================
-   SCAN QR
-============================================================ */
+/* ==========================================================
+   KIRIM KE INDEX
+========================================================== */
 
-function onScanSuccess(decodedText) {
+function sendToIndex(nisn){
 
     /*
-     * Jangan memproses QR berulang
-     * selama hasil sebelumnya belum kembali.
+     * Ini bagian penting.
      */
 
-    if (sedangMemproses) {
+    if(
+        !window.opener ||
+        window.opener.closed
+    ){
+
+        showError(
+            "Aplikasi utama tidak terhubung. " +
+            "Tutup scanner dan buka kembali dari tombol Scan QR."
+        );
+
+        setStatus(
+            "Koneksi aplikasi tidak ditemukan",
+            "Scanner harus dibuka dari aplikasi absensi."
+        );
+
+        processing =
+            false;
+
+        return false;
+
+    }
+
+
+    try{
+
+        window.opener.postMessage(
+
+            {
+                type:
+                    "ABSENSI_QR",
+
+                value:
+                    nisn,
+
+                time:
+                    Date.now()
+
+            },
+
+            "*"
+
+        );
+
+
+        console.log(
+            "ABSENSI_QR TERKIRIM:",
+            nisn
+        );
+
+
+        return true;
+
+    }catch(error){
+
+        console.error(
+            "POSTMESSAGE ERROR:",
+            error
+        );
+
+
+        showError(
+            "Gagal mengirim QR ke aplikasi utama."
+        );
+
+
+        processing =
+            false;
+
+
+        return false;
+
+    }
+
+}
+
+
+/* ==========================================================
+   SCAN SUCCESS
+========================================================== */
+
+function onScanSuccess(
+    decodedText
+){
+
+    if(processing){
         return;
     }
 
 
     const nisn =
-        extractNisn(
-            decodedText
-        );
+        getNisn(decodedText);
 
 
-    if (!nisn) {
+    if(!nisn){
         return;
     }
 
 
-    sedangMemproses =
+    /*
+     * Hindari scan QR yang sama
+     * berulang dalam waktu sangat singkat.
+     */
+
+    const now =
+        Date.now();
+
+
+    if(
+        nisn === lastNisn &&
+        now - lastSendTime < 2000
+    ){
+
+        return;
+
+    }
+
+
+    lastNisn =
+        nisn;
+
+    lastSendTime =
+        now;
+
+
+    processing =
         true;
 
 
@@ -1147,194 +985,152 @@ function onScanSuccess(decodedText) {
 
 
     /*
-     * Tampilkan sementara hanya:
-     *
-     * QR berhasil dibaca.
-     *
-     * JANGAN memasukkan "Siswa"
-     * ke history.
+     * Hapus hasil lama.
      */
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "none";
+
 
     setStatus(
         "QR berhasil dibaca ✓",
-        "Memeriksa data siswa..."
+        "Mengirim NISN ke aplikasi utama..."
     );
 
 
-    showResult({
+    /*
+     * KIRIM.
+     */
 
-        success: true,
+    const sent =
+        sendToIndex(
+            nisn
+        );
 
-        nama: "Memproses...",
 
-        kelas: "",
+    if(!sent){
+        return;
+    }
 
-        waktu: "",
 
-        message:
-            "NISN " +
-            nisn +
-            " sedang diperiksa..."
-
-    });
+    setStatus(
+        "QR terkirim ✓",
+        "Aplikasi utama sedang mencari nama siswa..."
+    );
 
 
     /*
-     * ========================================================
-     * INI KOMUNIKASI KE index.html
-     * ========================================================
-     *
-     * index.html kamu memang menunggu:
-     *
-     * type: "ABSENSI_QR"
-     *
-     * lalu memanggil Code.gs.
+     * Kalau 10 detik tidak ada jawaban,
+     * tampilkan pesan yang jelas.
      */
 
-    try {
-
-        if (
-            window.opener &&
-            !window.opener.closed
-        ) {
-
-            window.opener.postMessage(
-
-                {
-                    type:
-                        "ABSENSI_QR",
-
-                    value:
-                        nisn
-                },
-
-                "*"
-
-            );
+    clearTimeout(
+        waitingTimer
+    );
 
 
-            setStatus(
-                "Memeriksa siswa...",
-                "Menunggu hasil dari aplikasi utama."
-            );
+    waitingTimer =
+        setTimeout(
+            function(){
+
+                if(!processing){
+                    return;
+                }
 
 
-        } else {
-
-            /*
-             * Kalau opener hilang,
-             * hasil memang tidak akan pernah kembali.
-             */
-
-            showError(
-                "Scanner tidak terhubung dengan aplikasi utama. " +
-                "Tutup scanner lalu buka kembali melalui tombol Scan QR."
-            );
+                setStatus(
+                    "Belum menerima jawaban",
+                    "Pesan sudah dikirim. Periksa aplikasi utama."
+                );
 
 
-            setStatus(
-                "Koneksi aplikasi utama tidak ditemukan.",
-                "Buka scanner dari aplikasi absensi."
-            );
+                showError(
+                    "Aplikasi utama belum mengirim hasil absensi. " +
+                    "Coba tutup scanner dan buka kembali dari aplikasi utama."
+                );
 
 
-            sedangMemproses =
-                false;
+                processing =
+                    false;
 
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Gagal mengirim QR:",
-            error
+            },
+            10000
         );
-
-
-        showError(
-            "Gagal mengirim data QR ke aplikasi utama."
-        );
-
-
-        sedangMemproses =
-            false;
-
-    }
 
 }
 
 
-/* ============================================================
-   TERIMA HASIL DARI index.html
-============================================================ */
+/* ==========================================================
+   TERIMA HASIL DARI INDEX
+========================================================== */
 
 window.addEventListener(
     "message",
-    function(event) {
+    function(event){
 
-        if (
+        console.log(
+            "MESSAGE MASUK KE SCANNER:",
+            event.data
+        );
+
+
+        if(
             !event ||
             !event.data
-        ) {
+        ){
+
             return;
+
         }
+
+
+        if(
+            event.data.type !==
+            "ABSENSI_RESULT"
+        ){
+
+            return;
+
+        }
+
+
+        /*
+         * HASIL SUDAH KEMBALI.
+         */
+
+        clearTimeout(
+            waitingTimer
+        );
+
+
+        processing =
+            false;
 
 
         const data =
             event.data;
 
 
-        /*
-         * Kita hanya menerima pesan:
-         *
-         * ABSENSI_RESULT
-         */
-
-        if (
-            data.type !==
-            "ABSENSI_RESULT"
-        ) {
-
-            return;
-
-        }
-
-
         console.log(
-            "ABSENSI_RESULT diterima:",
+            "ABSENSI_RESULT DITERIMA:",
             data
         );
 
 
         /*
-         * ====================================================
-         * HASIL SUDAH KEMBALI
-         * ====================================================
+         * Simpan hanya kalau ada
+         * nama asli.
          */
 
-        sedangMemproses =
-            false;
+        saveResult(
+            data
+        );
 
 
         /*
-         * Simpan HANYA kalau nama
-         * memang dikirim.
-         */
-
-        if (
-            data.nama &&
-            String(data.nama).trim()
-        ) {
-
-            saveAttendanceResult(
-                data
-            );
-
-        }
-
-
-        /*
-         * Tampilkan hasil lengkap.
+         * Tampilkan nama.
          */
 
         showResult(
@@ -1342,29 +1138,19 @@ window.addEventListener(
         );
 
 
-        /*
-         * DUPLICATE
-         */
-
-        if (data.duplicate) {
+        if(data.duplicate){
 
             setStatus(
-                "⚠ Siswa sudah absen",
+                "⚠ Sudah absen",
                 data.message ||
                 (
-                    data.nama
-                        ? data.nama +
-                          " sudah tercatat."
-                        : "Sudah tercatat."
+                    data.nama +
+                    " sudah melakukan absensi."
                 )
             );
 
-
-        /*
-         * BERHASIL
-         */
-
-        } else if (data.success) {
+        }
+        else if(data.success){
 
             setStatus(
                 "✓ Absensi berhasil",
@@ -1374,18 +1160,13 @@ window.addEventListener(
                 ) +
                 (
                     data.waktu
-                        ? " • " +
-                          data.waktu
-                        : ""
+                    ? " • " + data.waktu
+                    : ""
                 )
             );
 
-
-        /*
-         * GAGAL
-         */
-
-        } else {
+        }
+        else{
 
             setStatus(
                 "✕ Absensi gagal",
@@ -1400,18 +1181,18 @@ window.addEventListener(
 );
 
 
-/* ============================================================
-   NOTIFIKASI SCANNER SIAP
-============================================================ */
+/* ==========================================================
+   SCANNER READY
+========================================================== */
 
-function notifyReady() {
+function notifyReady(){
 
-    try {
+    try{
 
-        if (
+        if(
             window.opener &&
             !window.opener.closed
-        ) {
+        ){
 
             window.opener.postMessage(
 
@@ -1424,12 +1205,17 @@ function notifyReady() {
 
             );
 
+
+            console.log(
+                "SCANNER READY TERKIRIM"
+            );
+
         }
 
-    } catch (e) {
+    }catch(e){
 
         console.warn(
-            "Tidak dapat mengirim status ready:",
+            "READY gagal:",
             e
         );
 
@@ -1438,11 +1224,11 @@ function notifyReady() {
 }
 
 
-/* ============================================================
-   START SCANNER
-============================================================ */
+/* ==========================================================
+   START CAMERA
+========================================================== */
 
-async function startScanner() {
+async function startScanner(){
 
     clearError();
 
@@ -1453,21 +1239,21 @@ async function startScanner() {
     );
 
 
-    try {
+    try{
 
-        if (
+        if(
             typeof Html5Qrcode ===
             "undefined"
-        ) {
+        ){
 
             throw new Error(
-                "Library QR scanner belum dimuat."
+                "Library scanner tidak tersedia."
             );
 
         }
 
 
-        scanner =
+        qrScanner =
             new Html5Qrcode(
                 "reader"
             );
@@ -1475,49 +1261,39 @@ async function startScanner() {
 
         const config = {
 
-            fps: 10,
+            fps:10,
 
-            qrbox:
-                function(
-                    width,
-                    height
-                ) {
+            qrbox:function(
+                width,
+                height
+            ){
 
-                    const size =
+                const size =
+                    Math.max(
+                        180,
                         Math.floor(
                             Math.min(
                                 width,
                                 height
                             ) * .7
-                        );
+                        )
+                    );
 
 
-                    return {
+                return {
 
-                        width:
-                            Math.max(
-                                180,
-                                size
-                            ),
+                    width:size,
 
-                        height:
-                            Math.max(
-                                180,
-                                size
-                            )
+                    height:size
 
-                    };
+                };
 
-                }
+            }
 
         };
 
 
-        /*
-         * Utamakan kamera belakang.
-         */
-
-        await scanner.start(
+        await qrScanner.start(
 
             {
                 facingMode:
@@ -1528,7 +1304,7 @@ async function startScanner() {
 
             onScanSuccess,
 
-            function() {}
+            function(){}
 
         );
 
@@ -1542,28 +1318,24 @@ async function startScanner() {
         notifyReady();
 
 
-    } catch (firstError) {
+    }catch(error){
 
         console.warn(
-            "Kamera belakang gagal:",
-            firstError
+            "Kamera environment gagal:",
+            error
         );
 
 
-        /*
-         * Fallback.
-         */
-
-        try {
+        try{
 
             const cameras =
                 await Html5Qrcode.getCameras();
 
 
-            if (
+            if(
                 !cameras ||
                 !cameras.length
-            ) {
+            ){
 
                 throw new Error(
                     "Kamera tidak ditemukan."
@@ -1572,57 +1344,21 @@ async function startScanner() {
             }
 
 
-            scanner =
+            qrScanner =
                 new Html5Qrcode(
                     "reader"
                 );
 
 
-            await scanner.start(
+            await qrScanner.start(
 
                 cameras[0].id,
 
-                {
-                    fps: 10,
-
-                    qrbox:
-                        function(
-                            width,
-                            height
-                        ) {
-
-                            const size =
-                                Math.floor(
-                                    Math.min(
-                                        width,
-                                        height
-                                    ) * .7
-                                );
-
-
-                            return {
-
-                                width:
-                                    Math.max(
-                                        180,
-                                        size
-                                    ),
-
-                                height:
-                                    Math.max(
-                                        180,
-                                        size
-                                    )
-
-                            };
-
-                        }
-
-                },
+                config,
 
                 onScanSuccess,
 
-                function() {}
+                function(){}
 
             );
 
@@ -1636,11 +1372,11 @@ async function startScanner() {
             notifyReady();
 
 
-        } catch (error) {
+        }catch(e){
 
             console.error(
-                "Kamera gagal:",
-                error
+                "KAMERA ERROR:",
+                e
             );
 
 
@@ -1662,42 +1398,36 @@ async function startScanner() {
 }
 
 
-/* ============================================================
+/* ==========================================================
    RETRY
-============================================================ */
+========================================================== */
 
 document
-    .getElementById("retry")
+    .getElementById(
+        "retry"
+    )
     .addEventListener(
         "click",
-        async function() {
+        async function(){
 
-            try {
+            try{
 
-                if (scanner) {
+                if(qrScanner){
 
-                    await scanner.stop();
+                    await qrScanner.stop();
 
-                    scanner.clear();
+                    qrScanner.clear();
 
                 }
 
-            } catch (e) {}
+            }catch(e){}
 
 
-            scanner =
+            qrScanner =
                 null;
 
-
-            sedangMemproses =
+            processing =
                 false;
-
-
-            document.getElementById(
-                "result"
-            ).style.display =
-                "none";
-
 
             startScanner();
 
@@ -1705,9 +1435,9 @@ document
     );
 
 
-/* ============================================================
+/* ==========================================================
    INIT
-============================================================ */
+========================================================== */
 
 renderHistory();
 
