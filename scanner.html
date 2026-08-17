@@ -371,6 +371,11 @@ window.addEventListener("message",function(event){
     item.time=data.waktu || item.time || "";
     item.status=data.status || item.status || "";
     item.message=data.message || item.message || "";
+
+    if(data.duplicate){
+      item.duplicate=true;
+      item.status="duplicate";
+    }
   }else{
     attendanceHistory.unshift({
       nisn:nisn,
@@ -379,8 +384,9 @@ window.addEventListener("message",function(event){
       time:data.waktu || new Date().toLocaleTimeString("id-ID",{
         hour:"2-digit",minute:"2-digit",second:"2-digit"
       }),
-      status:data.status || "",
-      message:data.message || ""
+      status:data.duplicate ? "duplicate" : (data.status || ""),
+      message:data.message || "",
+      duplicate:!!data.duplicate
     });
   }
 
@@ -388,17 +394,22 @@ window.addEventListener("message",function(event){
   renderHistory();
 
   const resultText=document.getElementById("resultText");
-  if(data.success){
+  if(data.duplicate){
+    resultText.textContent=
+      "⚠ Sudah Absen" +
+      (data.nama ? " • " + data.nama : "") +
+      (data.kelas ? " • " + data.kelas : "");
+
+    setStatus(
+      "⚠ Sudah Absen",
+      data.message || "Siswa ini sudah tercatat hari ini."
+    );
+
+  }else if(data.success){
     resultText.textContent=(data.nama || "Siswa")+" • "+(data.kelas || "Kelas");
     setStatus(
       "✓ "+(data.message || "Absensi berhasil dicatat."),
       "Kamera tetap aktif. Silakan scan siswa berikutnya."
-    );
-  }else if(data.duplicate){
-    resultText.textContent=(data.nama || "Siswa")+" sudah absen";
-    setStatus(
-      "Siswa sudah tercatat",
-      data.message || "Silakan scan siswa berikutnya."
     );
   }else{
     resultText.textContent=data.message || "Absensi gagal";
