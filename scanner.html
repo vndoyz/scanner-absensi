@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1"
+>
 
 <title>Scanner QR Kehadiran</title>
 
@@ -12,92 +17,149 @@
 </script>
 
 <style>
+
+/* =========================================================
+   DASAR HALAMAN
+========================================================= */
+
 *{
-  box-sizing:border-box
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
 }
 
 body{
-  margin:0;
   background:#0b1220;
   color:#fff;
   font-family:Arial,sans-serif;
-  min-height:100vh
 }
 
+
+/* =========================================================
+   HALAMAN UTAMA
+   Lebarnya dibuat lebih mirip halaman aplikasi utama
+========================================================= */
+
 .wrap{
-  max-width:520px;
-  margin:auto;
-  padding:16px
+  width:100%;
+  max-width:760px;
+  margin:0 auto;
+  padding:16px;
 }
+
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 .header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:16px
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.header-left{
+  min-width:0;
 }
 
 h1{
   font-size:20px;
-  margin:0
+  line-height:1.2;
+  margin:0;
 }
 
 .sub{
   font-size:12px;
   color:#94a3b8;
-  margin-top:5px
+  margin-top:5px;
 }
 
 button{
   border:0;
   border-radius:10px;
-  padding:11px 15px;
+  padding:10px 14px;
   font-weight:bold;
-  cursor:pointer
+  cursor:pointer;
 }
 
 #back{
   background:#1e293b;
-  color:white
+  color:white;
 }
 
-.card{
+
+/* =========================================================
+   KAMERA
+   Kamera tetap normal, tidak dibuat kartu-kartu
+========================================================= */
+
+.camera-card{
+  width:100%;
   background:#111827;
   border:1px solid #334155;
   border-radius:18px;
-  padding:10px
+  padding:10px;
 }
 
 #reader{
-  width:100%
+  width:100%;
 }
 
 #reader video{
   width:100%!important;
-  border-radius:12px
+  max-width:100%!important;
+  display:block;
+  border-radius:12px;
 }
 
+
+/* =========================================================
+   STATUS
+========================================================= */
+
 .status{
-  margin-top:14px;
+  margin-top:12px;
   text-align:center;
-  padding:14px;
+  padding:12px;
   background:#111827;
-  border-radius:14px
+  border:1px solid #1e293b;
+  border-radius:14px;
+}
+
+#status{
+  font-size:14px;
+  font-weight:bold;
 }
 
 #hint{
   font-size:12px;
   color:#94a3b8;
-  margin-top:5px
+  margin-top:5px;
 }
+
+
+/* =========================================================
+   ERROR
+========================================================= */
 
 #error{
   display:none;
   margin-top:12px;
-  padding:13px;
+  padding:12px;
   border-radius:12px;
   background:#451a1a;
-  color:#fecaca
+  border:1px solid #7f1d1d;
+  color:#fecaca;
+  font-size:13px;
+  text-align:center;
 }
 
 #retry{
@@ -105,39 +167,320 @@ button{
   width:100%;
   margin-top:10px;
   background:#dc2626;
-  color:white
+  color:white;
 }
 
-#result{
-  display:none;
-  margin-top:12px;
-  text-align:center;
-  padding:16px;
-  border-radius:14px;
-  background:#052e1b;
-  border:1px solid #166534
+
+/* =========================================================
+   JUDUL HASIL ABSENSI
+========================================================= */
+
+.result-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:16px;
+  margin-bottom:10px;
 }
 
-#resultText{
+.result-title{
+  font-size:15px;
   font-weight:bold;
-  white-space:pre-line
 }
+
+.result-count{
+  font-size:11px;
+  color:#94a3b8;
+}
+
+
+/* =========================================================
+   KOTAK HASIL ABSENSI
+   Tingginya dibuat supaya kira-kira 4 kartu terlihat
+========================================================= */
+
+.results-box{
+  height:300px;
+
+  overflow-y:auto;
+
+  overflow-x:hidden;
+
+  padding:4px;
+
+  background:#0f172a;
+
+  border:1px solid #1e293b;
+
+  border-radius:16px;
+
+  scrollbar-width:thin;
+}
+
+
+/* =========================================================
+   GRID
+   2 kolom = 4 kartu terlihat (2 x 2)
+========================================================= */
+
+.results-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:10px;
+}
+
+
+/* =========================================================
+   KARTU HASIL
+========================================================= */
+
+.scan-card{
+  min-width:0;
+
+  background:#111827;
+
+  border:1px solid #334155;
+
+  border-radius:14px;
+
+  padding:12px;
+
+  min-height:125px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:space-between;
+}
+
+
+/* kartu hasil terbaru */
+
+.scan-card.latest{
+  border-color:#10b981;
+
+  box-shadow:
+    0 0 0 1px rgba(16,185,129,.12);
+}
+
+
+/* ikon */
+
+.scan-icon{
+  width:32px;
+  height:32px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  background:#064e3b;
+
+  color:#6ee7b7;
+
+  font-size:17px;
+
+  margin-bottom:7px;
+}
+
+
+/* NISN */
+
+.scan-nisn{
+  font-size:13px;
+  font-weight:bold;
+  color:white;
+  word-break:break-word;
+}
+
+
+/* waktu */
+
+.scan-time{
+  font-size:11px;
+  color:#94a3b8;
+  margin-top:4px;
+}
+
+
+/* status */
+
+.scan-status{
+  display:inline-block;
+
+  margin-top:8px;
+
+  font-size:10px;
+
+  font-weight:bold;
+
+  padding:4px 7px;
+
+  border-radius:999px;
+
+  background:#064e3b;
+
+  color:#a7f3d0;
+
+  width:max-content;
+}
+
+
+/* =========================================================
+   KARTU DUPLIKAT
+========================================================= */
+
+.scan-card.duplicate{
+  border-color:#92400e;
+}
+
+.scan-card.duplicate .scan-icon{
+  background:#451a03;
+  color:#fbbf24;
+}
+
+.scan-card.duplicate .scan-status{
+  background:#451a03;
+  color:#fde68a;
+}
+
+
+/* =========================================================
+   TAMPILAN KOSONG
+========================================================= */
+
+.empty-result{
+  min-height:280px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  text-align:center;
+
+  color:#64748b;
+
+  padding:20px;
+
+  grid-column:1 / -1;
+}
+
+.empty-icon{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.empty-title{
+  font-size:13px;
+  font-weight:bold;
+  color:#94a3b8;
+}
+
+.empty-sub{
+  font-size:11px;
+  margin-top:4px;
+}
+
+
+/* =========================================================
+   HP
+========================================================= */
+
+@media(max-width:600px){
+
+  .wrap{
+    padding:12px;
+  }
+
+  h1{
+    font-size:18px;
+  }
+
+  .camera-card{
+    padding:8px;
+  }
+
+  .results-box{
+    height:300px;
+  }
+
+  .results-grid{
+    gap:8px;
+  }
+
+  .scan-card{
+    min-height:120px;
+    padding:10px;
+  }
+
+}
+
+
+/* =========================================================
+   HP SANGAT KECIL
+========================================================= */
+
+@media(max-width:380px){
+
+  h1{
+    font-size:17px;
+  }
+
+  #back{
+    padding:8px 10px;
+    font-size:11px;
+  }
+
+  .scan-card{
+    min-height:110px;
+    padding:9px;
+  }
+
+  .scan-nisn{
+    font-size:12px;
+  }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="wrap">
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
 
   <div class="header">
 
-    <div>
-      <h1>📷 Scan QR Kehadiran</h1>
+    <div class="header-left">
+
+      <h1>
+        📷 Scan QR Kehadiran
+      </h1>
 
       <div class="sub">
         Arahkan QR siswa ke kamera
       </div>
+
     </div>
+
 
     <button id="back">
       Kembali
@@ -146,12 +489,20 @@ button{
   </div>
 
 
-  <div class="card">
+  <!-- =====================================================
+       KAMERA
+  ====================================================== -->
+
+  <div class="camera-card">
 
     <div id="reader"></div>
 
   </div>
 
+
+  <!-- =====================================================
+       STATUS
+  ====================================================== -->
 
   <div class="status">
 
@@ -166,6 +517,10 @@ button{
   </div>
 
 
+  <!-- =====================================================
+       ERROR
+  ====================================================== -->
+
   <div id="error"></div>
 
   <button id="retry">
@@ -173,39 +528,102 @@ button{
   </button>
 
 
-  <div id="result">
+  <!-- =====================================================
+       HASIL ABSENSI
+  ====================================================== -->
 
-    <div style="font-size:30px">
-      ✓
+  <div class="result-header">
+
+    <div class="result-title">
+      Hasil Absensi
     </div>
 
-    <div id="resultText"></div>
+    <div
+      class="result-count"
+      id="resultCount"
+    >
+      0 siswa
+    </div>
 
   </div>
+
+
+  <!-- =====================================================
+       AREA SCROLL HASIL
+  ====================================================== -->
+
+  <div class="results-box">
+
+    <div
+      class="results-grid"
+      id="resultsGrid"
+    >
+
+      <div
+        class="empty-result"
+        id="emptyResult"
+      >
+
+        <div class="empty-icon">
+          📋
+        </div>
+
+        <div class="empty-title">
+          Belum ada hasil scan
+        </div>
+
+        <div class="empty-sub">
+          Hasil absensi akan muncul di sini.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 
 </div>
 
 
 <script>
 
+
+/* =========================================================
+   URL WEB APP
+========================================================= */
+
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwIJwq8jk0XX_1KuYEWzMLJXNxdfLOxAfsSUHc91R1BYH4J_TdnRYWjKrR2Mn55pR8K1Q/exec";
 
 
+/* =========================================================
+   VARIABEL
+========================================================= */
+
 let qrScanner = null;
 
 let processing = false;
+
+let scanResults = [];
 
 
 /* =========================================================
    STATUS
 ========================================================= */
 
-function status(text, hint = "") {
+function status(
+  text,
+  hint = ""
+){
 
-  document.getElementById("status").textContent = text;
+  document.getElementById(
+    "status"
+  ).textContent = text;
 
-  document.getElementById("hint").textContent = hint;
+  document.getElementById(
+    "hint"
+  ).textContent = hint;
 
 }
 
@@ -214,17 +632,20 @@ function status(text, hint = "") {
    ERROR
 ========================================================= */
 
-function error(text) {
+function error(text){
 
   const e =
-    document.getElementById("error");
+    document.getElementById(
+      "error"
+    );
 
   e.textContent = text;
 
   e.style.display = "block";
 
-  document.getElementById("retry")
-    .style.display = "block";
+  document.getElementById(
+    "retry"
+  ).style.display = "block";
 
 }
 
@@ -233,13 +654,15 @@ function error(text) {
    CLEAR ERROR
 ========================================================= */
 
-function clearError() {
+function clearError(){
 
-  document.getElementById("error")
-    .style.display = "none";
+  document.getElementById(
+    "error"
+  ).style.display = "none";
 
-  document.getElementById("retry")
-    .style.display = "none";
+  document.getElementById(
+    "retry"
+  ).style.display = "none";
 
 }
 
@@ -248,23 +671,56 @@ function clearError() {
    STOP SCANNER
 ========================================================= */
 
-async function stopScanner() {
+async function stopScanner(){
 
-  if (!qrScanner) return;
+  if(!qrScanner) return;
 
-  try {
-
+  try{
     await qrScanner.stop();
+  }catch(e){}
 
-  } catch (e) {}
-
-  try {
-
+  try{
     qrScanner.clear();
-
-  } catch (e) {}
+  }catch(e){}
 
   qrScanner = null;
+
+}
+
+
+/* =========================================================
+   GET NISN
+========================================================= */
+
+function getNisn(raw){
+
+  const text =
+    String(
+      raw || ""
+    ).trim();
+
+  if(!text) return "";
+
+  try{
+
+    const u =
+      new URL(text);
+
+    return (
+
+      u.searchParams.get("nisn") ||
+
+      u.searchParams.get("NISN") ||
+
+      text
+
+    ).trim();
+
+  }catch(e){
+
+    return text;
+
+  }
 
 }
 
@@ -273,14 +729,11 @@ async function stopScanner() {
    START SCANNER
 ========================================================= */
 
-async function startScanner() {
+async function startScanner(){
 
   processing = false;
 
   clearError();
-
-  document.getElementById("result")
-    .style.display = "none";
 
   status(
     "Membuka kamera...",
@@ -290,7 +743,10 @@ async function startScanner() {
   await stopScanner();
 
 
-  if (typeof Html5Qrcode === "undefined") {
+  if(
+    typeof Html5Qrcode ===
+    "undefined"
+  ){
 
     error(
       "Library scanner gagal dimuat. Pastikan koneksi internet aktif."
@@ -302,26 +758,28 @@ async function startScanner() {
 
 
   qrScanner =
-    new Html5Qrcode("reader");
+    new Html5Qrcode(
+      "reader"
+    );
 
 
   const config = {
 
-    fps: 10,
+    fps:10,
 
-    qrbox: (w, h) => {
+    qrbox:(w,h)=>{
 
       const s =
         Math.max(
           180,
           Math.floor(
-            Math.min(w, h) * 0.7
+            Math.min(w,h) * 0.7
           )
         );
 
       return {
-        width: s,
-        height: s
+        width:s,
+        height:s
       };
 
     }
@@ -329,19 +787,20 @@ async function startScanner() {
   };
 
 
-  try {
+  try{
 
     await qrScanner.start(
 
       {
-        facingMode: "environment"
+        facingMode:
+          "environment"
       },
 
       config,
 
       onScan,
 
-      () => {}
+      ()=>{}
 
     );
 
@@ -352,15 +811,16 @@ async function startScanner() {
     );
 
 
-  } catch (first) {
+  }catch(first){
 
-    try {
+    try{
 
       const cams =
-        await Html5Qrcode.getCameras();
+        await Html5Qrcode
+          .getCameras();
 
 
-      if (!cams.length) {
+      if(!cams.length){
 
         throw new Error(
           "Kamera tidak ditemukan"
@@ -377,7 +837,7 @@ async function startScanner() {
 
         onScan,
 
-        () => {}
+        ()=>{}
 
       );
 
@@ -388,7 +848,7 @@ async function startScanner() {
       );
 
 
-    } catch (err) {
+    }catch(err){
 
       const msg =
         String(
@@ -398,10 +858,10 @@ async function startScanner() {
         );
 
 
-      if (
+      if(
         /NotAllowed|Permission/i
           .test(msg)
-      ) {
+      ){
 
         error(
           "Akses kamera ditolak. Izinkan kamera untuk halaman ini lalu tekan Coba Lagi."
@@ -409,9 +869,9 @@ async function startScanner() {
 
       }
 
-      else if (
+      else if(
         /NotFound/i.test(msg)
-      ) {
+      ){
 
         error(
           "Kamera tidak ditemukan pada perangkat."
@@ -419,7 +879,7 @@ async function startScanner() {
 
       }
 
-      else {
+      else{
 
         error(
           "Kamera tidak dapat dibuka. Pastikan halaman dibuka melalui HTTPS."
@@ -435,40 +895,232 @@ async function startScanner() {
 
 
 /* =========================================================
-   AMBIL NISN DARI HASIL QR
+   TAMBAH HASIL
 ========================================================= */
 
-function getNisn(raw) {
+function addScanResult(
+  nisn,
+  duplicate = false
+){
 
-  const text =
-    String(raw || "").trim();
+  scanResults.unshift({
 
+    nisn:nisn,
 
-  if (!text) return "";
+    duplicate:duplicate,
 
+    time:new Date()
 
-  try {
-
-    const u =
-      new URL(text);
-
-
-    return (
-
-      u.searchParams.get("nisn") ||
-
-      u.searchParams.get("NISN") ||
-
-      text
-
-    ).trim();
+  });
 
 
-  } catch (e) {
+  renderResults();
 
-    return text;
+}
+
+
+/* =========================================================
+   RENDER HASIL
+========================================================= */
+
+function renderResults(){
+
+  const grid =
+    document.getElementById(
+      "resultsGrid"
+    );
+
+  const count =
+    document.getElementById(
+      "resultCount"
+    );
+
+
+  count.textContent =
+    scanResults.length +
+    " siswa";
+
+
+  if(
+    scanResults.length === 0
+  ){
+
+    grid.innerHTML = "";
+
+    grid.appendChild(
+      createEmptyResult()
+    );
+
+    return;
 
   }
+
+
+  grid.innerHTML = "";
+
+
+  scanResults.forEach(
+    (item,index)=>{
+
+      grid.appendChild(
+        createScanCard(
+          item,
+          index === 0
+        )
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   KARTU KOSONG
+========================================================= */
+
+function createEmptyResult(){
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.className =
+    "empty-result";
+
+
+  div.innerHTML = `
+
+    <div class="empty-icon">
+      📋
+    </div>
+
+    <div class="empty-title">
+      Belum ada hasil scan
+    </div>
+
+    <div class="empty-sub">
+      Hasil absensi akan muncul di sini.
+    </div>
+
+  `;
+
+
+  return div;
+
+}
+
+
+/* =========================================================
+   BUAT KARTU
+========================================================= */
+
+function createScanCard(
+  item,
+  latest = false
+){
+
+  const card =
+    document.createElement(
+      "div"
+    );
+
+
+  card.className =
+    "scan-card" +
+    (
+      latest
+        ? " latest"
+        : ""
+    ) +
+    (
+      item.duplicate
+        ? " duplicate"
+        : ""
+    );
+
+
+  const time =
+    item.time.toLocaleTimeString(
+      "id-ID",
+      {
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
+      }
+    );
+
+
+  card.innerHTML = `
+
+    <div>
+
+      <div class="scan-icon">
+
+        ${
+          item.duplicate
+            ? "⚠️"
+            : "✓"
+        }
+
+      </div>
+
+
+      <div class="scan-nisn">
+
+        NISN:
+        ${escapeHtml(item.nisn)}
+
+      </div>
+
+
+      <div class="scan-time">
+
+        ${time}
+
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <span class="scan-status">
+
+        ${
+          item.duplicate
+            ? "Sudah Absen"
+            : "Terkirim"
+        }
+
+      </span>
+
+    </div>
+
+  `;
+
+
+  return card;
+
+}
+
+
+/* =========================================================
+   AMANKAN TEXT
+========================================================= */
+
+function escapeHtml(text){
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.textContent =
+    String(text);
+
+  return div.innerHTML;
 
 }
 
@@ -477,16 +1129,20 @@ function getNisn(raw) {
    QR BERHASIL DIBACA
 ========================================================= */
 
-async function onScan(decodedText) {
+async function onScan(
+  decodedText
+){
 
-  if (processing) return;
+  if(processing) return;
 
 
   const nisn =
-    getNisn(decodedText);
+    getNisn(
+      decodedText
+    );
 
 
-  if (!nisn) return;
+  if(!nisn) return;
 
 
   processing = true;
@@ -501,48 +1157,38 @@ async function onScan(decodedText) {
   await stopScanner();
 
 
-  /* =====================================================
-     TAMPILKAN HASIL DI SCANNER
-  ===================================================== */
+  /*
+   * Tampilkan hasil scan.
+   */
 
-  document.getElementById("result")
-    .style.display = "block";
-
-
-  document.getElementById("resultText")
-    .textContent =
-      "NISN terbaca: " + nisn +
-      "\n\nMengirim ke aplikasi absensi...";
+  addScanResult(
+    nisn,
+    false
+  );
 
 
-  /* =====================================================
-     KIRIM KE INDEX.HTML
-     
-     INI BAGIAN YANG DIPERBAIKI
-     
-     SEBELUM:
-       type: "attendance_qr"
-       nisn: nisn
+  /*
+   * KIRIM KE INDEX.HTML
+   *
+   * Ini format yang sudah terbukti
+   * berhasil pada tes kita.
+   */
 
-     SEKARANG:
-       type: "ABSENSI_QR"
-       value: nisn
-
-     HARUS SAMA DENGAN YANG DITUNGGU INDEX.HTML
-  ===================================================== */
-
-  if (
+  if(
     window.opener &&
     !window.opener.closed
-  ) {
+  ){
 
-    try {
+    try{
 
       window.opener.postMessage(
 
         {
-          type: "ABSENSI_QR",
-          value: nisn
+          type:
+            "ABSENSI_QR",
+
+          value:
+            nisn
         },
 
         "*"
@@ -556,47 +1202,39 @@ async function onScan(decodedText) {
       );
 
 
-      document.getElementById("resultText")
-        .textContent =
-          "NISN: " + nisn +
-          "\n\n✓ Data dikirim ke aplikasi absensi.";
-
-
       /*
-       * JANGAN langsung menutup popup.
-       *
-       * Kita beri waktu supaya index.html
-       * menerima pesan dan memanggil Code.gs.
+       * Beri waktu index.html
+       * menerima pesan sebelum popup
+       * ditutup.
        */
 
-      setTimeout(() => {
+      setTimeout(
+        ()=>{
 
-        try {
+          try{
 
-          if (
-            window.opener &&
-            !window.opener.closed
-          ) {
+            if(
+              window.opener &&
+              !window.opener.closed
+            ){
 
-            window.close();
+              window.close();
 
-          }
+            }
 
-        } catch (e) {}
+          }catch(e){}
 
-      }, 1500);
+        },
+        1500
+      );
 
 
-    } catch (e) {
-
-      document.getElementById("resultText")
-        .textContent =
-          "NISN: " + nisn +
-          "\n\nGagal mengirim ke aplikasi.";
+    }catch(e){
 
       error(
-        "Scanner berhasil membaca QR, tetapi gagal mengirim hasil ke aplikasi utama."
+        "QR berhasil dibaca, tetapi gagal mengirim data ke aplikasi utama."
       );
+
 
       processing = false;
 
@@ -604,24 +1242,12 @@ async function onScan(decodedText) {
 
   }
 
-  else {
-
-    /*
-     * Scanner dibuka langsung tanpa
-     * window.opener.
-     *
-     * Untuk kondisi ini kita beri
-     * pemberitahuan yang jelas.
-     */
-
-    document.getElementById("resultText")
-      .textContent =
-        "NISN: " + nisn +
-        "\n\nScanner tidak terhubung dengan aplikasi utama.";
+  else{
 
     error(
       "Jendela aplikasi utama tidak ditemukan. Buka scanner dari tombol Scan QR di aplikasi absensi."
     );
+
 
     processing = false;
 
@@ -631,43 +1257,51 @@ async function onScan(decodedText) {
 
 
 /* =========================================================
-   TOMBOL RETRY
+   RETRY
 ========================================================= */
 
 document
-  .getElementById("retry")
-  .onclick = startScanner;
+  .getElementById(
+    "retry"
+  )
+  .onclick =
+    startScanner;
 
 
 /* =========================================================
-   TOMBOL KEMBALI
+   KEMBALI
 ========================================================= */
 
 document
-  .getElementById("back")
-  .onclick = async () => {
+  .getElementById(
+    "back"
+  )
+  .onclick =
+    async()=>{
 
-    await stopScanner();
+      await stopScanner();
 
 
-    if (history.length > 1) {
+      if(
+        history.length > 1
+      ){
 
-      history.back();
+        history.back();
 
-    }
+      }
 
-    else {
+      else{
 
-      window.location.href =
-        APPS_SCRIPT_URL;
+        window.location.href =
+          APPS_SCRIPT_URL;
 
-    }
+      }
 
-  };
+    };
 
 
 /* =========================================================
-   SEBELUM HALAMAN DITUTUP
+   SAAT HALAMAN DITUTUP
 ========================================================= */
 
 window.addEventListener(
@@ -677,8 +1311,10 @@ window.addEventListener(
 
 
 /* =========================================================
-   MULAI KAMERA
+   MULAI SCANNER
 ========================================================= */
+
+renderResults();
 
 startScanner();
 
