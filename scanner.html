@@ -278,19 +278,23 @@ async function onScan(decodedText){
 
   processing=true;
 
+  // Simpan hasil scan langsung di scanner.html.
   const isNew=addHistory(nisn);
 
   document.getElementById("result").style.display="block";
-  document.getElementById("resultText").textContent=
-    isNew ? "NISN terbaca: "+nisn : "NISN "+nisn+" sudah ada di Absensi Hari Ini";
+  document.getElementById("resultText").textContent =
+    isNew
+      ? "NISN terbaca: "+nisn
+      : "NISN "+nisn+" sudah ada di Absensi Hari Ini";
 
   /*
-   * INI HARUS SAMA DENGAN INDEX:
-   * type = ABSENSI_QR
-   * value = NISN
+   * Kirim ke INDEX yang membuka popup.
+   *
+   * Penting:
+   * - Scanner tidak menunggu balasan dari index.
+   * - Scanner tidak menghentikan kamera.
+   * - Scanner tidak menutup popup.
    */
-  let sent=false;
-
   if(window.opener && !window.opener.closed){
     try{
       window.opener.postMessage(
@@ -300,33 +304,36 @@ async function onScan(decodedText){
         },
         "*"
       );
-      sent=true;
+
+      setStatus(
+        isNew ? "QR berhasil dibaca ✓" : "Siswa sudah tercatat",
+        "Data dikirim ke aplikasi. Kamera tetap aktif."
+      );
+
     }catch(e){
-      console.error("postMessage gagal:",e);
+      console.error("Gagal mengirim NISN ke index:",e);
+
+      setStatus(
+        "QR berhasil dibaca ✓",
+        "Hasil tersimpan di Absensi Hari Ini."
+      );
     }
-  }
-
-  if(sent){
-    setStatus(
-      isNew ? "QR berhasil dibaca ✓" : "Siswa sudah tercatat",
-      "Data dikirim. Kamera tetap aktif. Scan siswa berikutnya."
-    );
   }else{
+    /*
+     * Jika scanner dibuka langsung dari URL GitHub,
+     * tidak ada window.opener. Ini bukan error scanner.
+     */
     setStatus(
-      "QR terbaca ✓",
-      "Popup tidak terhubung ke halaman utama. Jangan tutup scanner ini."
+      "QR berhasil dibaca ✓",
+      "Hasil tersimpan di Absensi Hari Ini. Buka scanner dari index untuk mengirim ke aplikasi."
     );
-    showError("Scanner tidak menemukan halaman index sebagai pembuka popup. Tutup scanner dan buka kembali dari tombol Buka Kamera Scanner di index.");
   }
 
-  /*
-   * Jangan stopScanner().
-   * Jangan window.close().
-   */
+  // Jeda singkat agar satu QR tidak terbaca berkali-kali.
+  // Kamera TETAP hidup.
   setTimeout(function(){
     processing=false;
     clearError();
-
     setStatus(
       "Kamera siap",
       "Arahkan QR siswa berikutnya ke kotak scanner."
