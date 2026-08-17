@@ -1,541 +1,549 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Scanner QR Kehadiran - SDN 8 Mentok</title>
-
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
-<style>
-:root{
-  --red:#dc2626;
-  --blue:#1d4ed8;
-  --bg:#05060a;
-  --panel:#11131d;
-  --panel2:#08090f;
-  --border:rgba(148,163,184,.14);
-  --muted:#94a3b8;
-  --green:#22c55e;
-  --yellow:#f59e0b;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  background:#05060a;
-  color:#fff;
-}
-
-body{
-  font-family:Arial,Helvetica,sans-serif;
-  background-image:
-    radial-gradient(
-      circle at 12% 15%,
-      rgba(220,38,38,.18),
-      transparent 42%
-    ),
-    radial-gradient(
-      circle at 88% 85%,
-      rgba(29,78,216,.22),
-      transparent 46%
-    ),
-    repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,.025) 0,
-      rgba(255,255,255,.025) 1px,
-      transparent 1px,
-      transparent 64px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255,255,255,.025) 0,
-      rgba(255,255,255,.025) 1px,
-      transparent 1px,
-      transparent 64px
-    );
-  background-attachment:fixed;
-  background-size:cover;
-  min-height:100vh;
-}
-
-button{
-  border:0;
-  border-radius:10px;
-  padding:10px 14px;
-  font-family:inherit;
-  font-weight:700;
-  cursor:pointer;
-  transition:.18s ease;
-}
-
-button:active{
-  transform:scale(.97);
-}
-
-.wrap{
-  width:100%;
-  max-width:560px;
-  margin:0 auto;
-  padding:16px;
-}
-
-/* ================================
-   HEADER
-================================ */
-
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:14px;
-}
-
-h1{
-  margin:0;
-  font-size:20px;
-  font-weight:800;
-}
-
-.sub{
-  margin-top:4px;
-  color:var(--muted);
-  font-size:11px;
-}
-
-#back{
-  color:#fff;
-  background:linear-gradient(
-    135deg,
-    rgba(220,38,38,.9),
-    rgba(29,78,216,.9)
-  );
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 6px 20px rgba(0,0,0,.25);
-}
-
-/* ================================
-   CARD
-================================ */
-
-.card,
-.status,
-.history-wrap,
-.result{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(17,19,29,.96),
-      rgba(8,9,15,.98)
-    );
-
-  border:1px solid var(--border);
-
-  box-shadow:
-    0 12px 30px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,.025);
-
-  backdrop-filter:blur(10px);
-}
-
-.card{
-  border-radius:18px;
-  padding:10px;
-  overflow:hidden;
-}
-
-#reader{
-  width:100%;
-  overflow:hidden;
-  border-radius:12px;
-}
-
-#reader video{
-  width:100%!important;
-  height:auto!important;
-  min-height:250px;
-  object-fit:cover;
-  border-radius:12px!important;
-}
-
-#reader__scan_region{
-  border-radius:12px;
-  overflow:hidden;
-}
-
-#reader__dashboard{
-  color:#cbd5e1!important;
-  padding-top:8px!important;
-}
-
-#reader__dashboard button{
-  color:#fff!important;
-  background:
-    linear-gradient(
-      120deg,
-      var(--red),
-      var(--blue)
-    )!important;
-  border:0!important;
-  border-radius:9px!important;
-}
-
-#reader__dashboard select{
-  background:#11131d!important;
-  color:#fff!important;
-  border:1px solid rgba(148,163,184,.2)!important;
-  border-radius:8px!important;
-}
-
-/* ================================
-   STATUS
-================================ */
-
-.status{
-  margin-top:12px;
-  text-align:center;
-  padding:12px;
-  border-radius:14px;
-}
-
-#status{
-  font-size:13px;
-  font-weight:700;
-}
-
-#hint{
-  font-size:10px;
-  color:var(--muted);
-  margin-top:5px;
-}
-
-/* ================================
-   ERROR
-================================ */
-
-#error{
-  display:none;
-  margin-top:10px;
-  padding:11px;
-  border-radius:12px;
-  background:rgba(127,29,29,.35);
-  border:1px solid rgba(248,113,113,.22);
-  color:#fecaca;
-  font-size:12px;
-}
-
-#retry{
-  display:none;
-  width:100%;
-  margin-top:9px;
-  color:#fff;
-  background:
-    linear-gradient(
-      120deg,
-      var(--red),
-      var(--blue)
-    );
-}
-
-/* ================================
-   RESULT
-================================ */
-
-.result{
-  display:none;
-  margin-top:12px;
-  text-align:center;
-  padding:14px;
-  border-radius:14px;
-}
-
-.result.success{
-  border-color:rgba(34,197,94,.35);
-}
-
-.result.warning{
-  border-color:rgba(245,158,11,.4);
-}
-
-.result.error{
-  border-color:rgba(239,68,68,.4);
-}
-
-#resultIcon{
-  font-size:28px;
-  margin-bottom:5px;
-}
-
-#resultText{
-  font-weight:800;
-  font-size:14px;
-  line-height:1.5;
-}
-
-#resultDetail{
-  margin-top:5px;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.5;
-}
-
-/* ================================
-   HISTORY
-================================ */
-
-.history-wrap{
-  margin-top:12px;
-  border-radius:18px;
-  padding:12px;
-}
-
-.history-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:9px;
-}
-
-.history-title{
-  font-size:14px;
-  font-weight:800;
-}
-
-.history-count{
-  font-size:10px;
-  color:var(--muted);
-}
-
-.history-list{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-  max-height:300px;
-  overflow-y:auto;
-  padding-right:2px;
-}
-
-.history-card{
-  position:relative;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(17,19,29,.95),
-      rgba(8,9,15,.98)
-    );
-
-  border:1px solid rgba(148,163,184,.12);
-  border-radius:12px;
-  padding:9px;
-  min-height:92px;
-}
-
-.history-card.duplicate{
-  border-color:rgba(245,158,11,.35);
-}
-
-.history-name{
-  font-size:12px;
-  font-weight:800;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.history-class{
-  font-size:10px;
-  color:#cbd5e1;
-  margin-top:4px;
-}
-
-.history-nisn{
-  font-size:10px;
-  color:var(--muted);
-  margin-top:3px;
-  word-break:break-all;
-}
-
-.history-time{
-  font-size:10px;
-  color:var(--muted);
-  margin-top:4px;
-}
-
-.history-status{
-  display:inline-block;
-  margin-top:5px;
-  font-size:9px;
-  font-weight:800;
-  padding:3px 6px;
-  border-radius:6px;
-  background:rgba(34,197,94,.12);
-  color:#86efac;
-}
-
-.history-card.duplicate .history-status{
-  background:rgba(245,158,11,.12);
-  color:#fcd34d;
-}
-
-.empty-history{
-  grid-column:1/-1;
-  text-align:center;
-  color:#64748b;
-  padding:18px 8px;
-  font-size:11px;
-}
-
-.history-list::-webkit-scrollbar{
-  width:5px;
-}
-
-.history-list::-webkit-scrollbar-track{
-  background:rgba(255,255,255,.02);
-}
-
-.history-list::-webkit-scrollbar-thumb{
-  background:
-    linear-gradient(
-      var(--red),
-      var(--blue)
-    );
-  border-radius:20px;
-}
-
-/* ================================
-   HP
-================================ */
-
-@media(max-width:380px){
-
-  .wrap{
-    padding:10px;
-  }
-
-  h1{
-    font-size:18px;
-  }
-
-  .history-list{
-    grid-template-columns:1fr;
-  }
-
-  #reader video{
-    min-height:220px;
-  }
-}
-
-@media(orientation:landscape) and (max-height:600px){
-
-  .wrap{
-    max-width:700px;
-    padding:8px 14px;
-  }
-
-  .history-list{
-    max-height:180px;
-  }
-
-  #reader video{
-    max-height:48vh;
-    object-fit:cover;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>Scanner Absensi - SDN 8 Mentok</title>
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #080b12,
+                    #111827
+                );
+
+            color: #ffffff;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .title {
+            font-size: 21px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .subtitle {
+            margin-top: 5px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        /* =========================
+           SCANNER
+        ========================= */
+
+        .scanner-card {
+            background: #0f172a;
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+
+            border-radius: 18px;
+
+            padding: 10px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,.35);
+
+            overflow: hidden;
+        }
+
+        #reader {
+            width: 100%;
+        }
+
+        #reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 12px !important;
+            object-fit: cover;
+        }
+
+        #reader__scan_region {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #reader__dashboard {
+            padding-top: 8px !important;
+        }
+
+        #reader__dashboard button {
+            background:
+                linear-gradient(
+                    135deg,
+                    #dc2626,
+                    #2563eb
+                ) !important;
+
+            color: #fff !important;
+
+            border: none !important;
+
+            border-radius: 9px !important;
+
+            padding: 9px 12px !important;
+
+            font-weight: 700 !important;
+        }
+
+        #reader__dashboard select {
+            background: #111827 !important;
+            color: #fff !important;
+
+            border:
+                1px solid
+                rgba(255,255,255,.15) !important;
+
+            border-radius: 8px !important;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status-card {
+            margin-top: 12px;
+
+            padding: 12px;
+
+            border-radius: 14px;
+
+            text-align: center;
+
+            background: #0f172a;
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+        }
+
+        #status {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        #statusDetail {
+            margin-top: 4px;
+
+            font-size: 11px;
+
+            color: #94a3b8;
+        }
+
+        /* =========================
+           HASIL SCAN
+        ========================= */
+
+        .result {
+            display: none;
+
+            margin-top: 12px;
+
+            padding: 15px;
+
+            border-radius: 15px;
+
+            text-align: center;
+
+            background: #0f172a;
+
+            border:
+                1px solid
+                rgba(34,197,94,.35);
+        }
+
+        .result.warning {
+            border-color:
+                rgba(245,158,11,.45);
+        }
+
+        .result.error {
+            border-color:
+                rgba(239,68,68,.45);
+        }
+
+        .result-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .result-name {
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .result-class {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        .result-time {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .result-message {
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           HISTORY
+        ========================= */
+
+        .history-card {
+            margin-top: 12px;
+
+            background: #0f172a;
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+
+            border-radius: 16px;
+
+            padding: 12px;
+        }
+
+        .history-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 9px;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .history-count {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        #history {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+            max-height: 300px;
+
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            border:
+                1px solid
+                rgba(255,255,255,.06);
+        }
+
+        .history-item.duplicate {
+            border-color:
+                rgba(245,158,11,.35);
+        }
+
+        .history-name {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .history-class {
+            margin-top: 3px;
+            font-size: 10px;
+            color: #cbd5e1;
+        }
+
+        .history-info {
+            margin-top: 3px;
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        .history-status {
+            display: inline-block;
+
+            margin-top: 6px;
+
+            padding:
+                3px 7px;
+
+            border-radius: 6px;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            background:
+                rgba(34,197,94,.12);
+
+            color:
+                #86efac;
+        }
+
+        .history-item.duplicate
+        .history-status {
+
+            background:
+                rgba(245,158,11,.12);
+
+            color:
+                #fcd34d;
+        }
+
+        .empty {
+            text-align: center;
+
+            color: #64748b;
+
+            padding: 16px;
+
+            font-size: 11px;
+        }
+
+        /* =========================
+           ERROR
+        ========================= */
+
+        #error {
+            display: none;
+
+            margin-top: 10px;
+
+            padding: 10px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(127,29,29,.35);
+
+            border:
+                1px solid
+                rgba(248,113,113,.25);
+
+            color: #fecaca;
+
+            font-size: 11px;
+
+            text-align: center;
+        }
+
+        #retry {
+            display: none;
+
+            width: 100%;
+
+            margin-top: 8px;
+
+            padding: 11px;
+
+            color: #fff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #dc2626,
+                    #2563eb
+                );
+        }
+
+        @media(max-width:380px) {
+
+            .container {
+                padding: 10px;
+            }
+
+            .title {
+                font-size: 19px;
+            }
+
+        }
+
+    </style>
 </head>
+
 
 <body>
 
-<div class="wrap">
+<div class="container">
 
-  <div class="header">
+    <!-- HEADER -->
 
-    <div>
-      <h1>📷 Scan QR Kehadiran</h1>
-      <div class="sub">
-        Arahkan QR siswa ke kamera
-      </div>
+    <div class="header">
+
+        <div class="title">
+            📷 Scan QR Kehadiran
+        </div>
+
+        <div class="subtitle">
+            SD Negeri 8 Mentok
+        </div>
+
     </div>
 
-    <button id="back" type="button">
-      Kembali
+
+    <!-- SCANNER -->
+
+    <div class="scanner-card">
+
+        <div id="reader"></div>
+
+    </div>
+
+
+    <!-- STATUS -->
+
+    <div class="status-card">
+
+        <div id="status">
+            Menyiapkan kamera...
+        </div>
+
+        <div id="statusDetail">
+            Mohon izinkan akses kamera.
+        </div>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div id="error"></div>
+
+    <button
+        id="retry"
+        type="button"
+    >
+        Coba Lagi
     </button>
 
-  </div>
 
+    <!-- HASIL -->
 
-  <!-- SCANNER -->
+    <div
+        id="result"
+        class="result"
+    >
 
-  <div class="card">
-    <div id="reader"></div>
-  </div>
+        <div
+            id="resultIcon"
+            class="result-icon"
+        >
+            ✓
+        </div>
 
+        <div
+            id="resultName"
+            class="result-name"
+        ></div>
 
-  <!-- STATUS -->
+        <div
+            id="resultClass"
+            class="result-class"
+        ></div>
 
-  <div class="status">
-    <div id="status">
-      Membuka kamera...
-    </div>
+        <div
+            id="resultTime"
+            class="result-time"
+        ></div>
 
-    <div id="hint">
-      Izinkan akses kamera jika diminta.
-    </div>
-  </div>
-
-
-  <!-- ERROR -->
-
-  <div id="error"></div>
-
-  <button id="retry" type="button">
-    Coba Lagi
-  </button>
-
-
-  <!-- HASIL SCAN -->
-
-  <div id="result" class="result">
-
-    <div id="resultIcon">
-      ✓
-    </div>
-
-    <div id="resultText"></div>
-
-    <div id="resultDetail"></div>
-
-  </div>
-
-
-  <!-- HISTORY -->
-
-  <div class="history-wrap">
-
-    <div class="history-head">
-
-      <div class="history-title">
-        📋 Absensi Hari Ini
-      </div>
-
-      <div id="historyCount" class="history-count">
-        0 siswa
-      </div>
+        <div
+            id="resultMessage"
+            class="result-message"
+        ></div>
 
     </div>
 
-    <div id="historyList" class="history-list"></div>
 
-  </div>
+    <!-- HISTORY -->
+
+    <div class="history-card">
+
+        <div class="history-header">
+
+            <div class="history-title">
+                📋 Absensi Hari Ini
+            </div>
+
+            <div
+                id="historyCount"
+                class="history-count"
+            >
+                0 siswa
+            </div>
+
+        </div>
+
+        <div id="history">
+
+            <div class="empty">
+                Belum ada absensi hari ini.
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -543,215 +551,114 @@ h1{
 <script>
 
 /* ============================================================
-   KONFIGURASI
+   VARIABEL
 ============================================================ */
 
-let qrScanner = null;
+let scanner = null;
 
-let processing = false;
-
-let todayKey = getTodayKey();
-
-let historyKey = "absensi_history_" + todayKey;
-
-/*
- * History hanya berisi hasil yang sudah mendapatkan
- * jawaban dari index.html.
- *
- * TIDAK ADA LAGI:
- * nama:"Siswa"
- */
-
-let attendanceHistory = loadHistory();
+let sedangMemproses = false;
 
 
 /* ============================================================
-   TANGGAL
+   STORAGE
 ============================================================ */
 
-function getTodayKey(){
+function getTanggalKey() {
 
-  const d = new Date();
+    const d = new Date();
 
-  return (
-    d.getFullYear() +
-    "-" +
-    String(d.getMonth()+1).padStart(2,"0") +
-    "-" +
-    String(d.getDate()).padStart(2,"0")
-  );
+    return (
+        d.getFullYear() +
+        "-" +
+        String(d.getMonth() + 1).padStart(2,"0") +
+        "-" +
+        String(d.getDate()).padStart(2,"0")
+    );
 
 }
+
+
+const STORAGE_KEY =
+    "absensi_hari_ini_" +
+    getTanggalKey();
+
+
+let history =
+    loadHistory();
 
 
 /* ============================================================
-   STATUS
+   LOAD HISTORY
 ============================================================ */
 
-function setStatus(text,hint){
+function loadHistory() {
 
-  document.getElementById("status").textContent =
-    text || "";
+    try {
 
-  document.getElementById("hint").textContent =
-    hint || "";
+        const raw =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
 
-}
+        if (!raw) {
+            return [];
+        }
 
+        const data =
+            JSON.parse(raw);
 
-function showError(text){
+        if (!Array.isArray(data)) {
+            return [];
+        }
 
-  const error =
-    document.getElementById("error");
+        /*
+         * Bersihkan data lama yang memakai
+         * nama placeholder "Siswa".
+         */
 
-  error.textContent =
-    text || "Terjadi kesalahan.";
+        return data.filter(
+            item =>
+                item &&
+                item.nama &&
+                item.nama !== "Siswa" &&
+                item.nisn
+        );
 
-  error.style.display =
-    "block";
+    } catch (e) {
 
-  document.getElementById("retry").style.display =
-    "block";
+        console.error(
+            "Gagal membaca history:",
+            e
+        );
 
-}
+        return [];
 
-
-function clearError(){
-
-  document.getElementById("error").style.display =
-    "none";
-
-  document.getElementById("retry").style.display =
-    "none";
-
-}
-
-
-/* ============================================================
-   HASIL SCAN
-============================================================ */
-
-function showResult(type,title,detail){
-
-  const box =
-    document.getElementById("result");
-
-  const icon =
-    document.getElementById("resultIcon");
-
-  const text =
-    document.getElementById("resultText");
-
-  const detailEl =
-    document.getElementById("resultDetail");
-
-
-  box.className =
-    "result " + (type || "");
-
-
-  if(type === "warning"){
-
-    icon.textContent = "⚠";
-
-  }else if(type === "error"){
-
-    icon.textContent = "✕";
-
-  }else{
-
-    icon.textContent = "✓";
-
-  }
-
-
-  text.textContent =
-    title || "";
-
-  detailEl.textContent =
-    detail || "";
-
-
-  box.style.display =
-    "block";
-
-}
-
-
-/* ============================================================
-   LOCAL STORAGE
-============================================================ */
-
-function loadHistory(){
-
-  try{
-
-    const raw =
-      localStorage.getItem(historyKey);
-
-    if(!raw){
-      return [];
     }
 
-    const parsed =
-      JSON.parse(raw);
-
-    if(!Array.isArray(parsed)){
-      return [];
-    }
-
-    /*
-     * Bersihkan placeholder dari versi scanner lama.
-     *
-     * Jadi kalau hari ini sebelumnya sudah ada:
-     *
-     * nama:"Siswa"
-     *
-     * kartu tersebut tidak dipertahankan.
-     */
-
-    return parsed.filter(function(item){
-
-      return (
-        item &&
-        item.nisn &&
-        item.nama &&
-        item.nama !== "Siswa"
-      );
-
-    });
-
-  }catch(error){
-
-    console.warn(
-      "History tidak dapat dibaca:",
-      error
-    );
-
-    return [];
-
-  }
-
 }
 
 
-function saveHistory(){
+/* ============================================================
+   SAVE HISTORY
+============================================================ */
 
-  try{
+function saveHistory() {
 
-    localStorage.setItem(
-      historyKey,
-      JSON.stringify(attendanceHistory)
-    );
+    try {
 
-  }catch(error){
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(history)
+        );
 
-    console.warn(
-      "History tidak dapat disimpan:",
-      error
-    );
+    } catch (e) {
 
-  }
+        console.error(
+            "Gagal menyimpan history:",
+            e
+        );
+
+    }
 
 }
 
@@ -760,17 +667,17 @@ function saveHistory(){
    ESCAPE HTML
 ============================================================ */
 
-function escapeHtml(value){
+function escapeHtml(value) {
 
-  const el =
-    document.createElement("div");
+    const div =
+        document.createElement("div");
 
-  el.textContent =
-    String(
-      value == null ? "" : value
-    );
+    div.textContent =
+        value == null
+            ? ""
+            : String(value);
 
-  return el.innerHTML;
+    return div.innerHTML;
 
 }
 
@@ -779,233 +686,373 @@ function escapeHtml(value){
    RENDER HISTORY
 ============================================================ */
 
-function renderHistory(){
+function renderHistory() {
 
-  const list =
-    document.getElementById(
-      "historyList"
-    );
+    const container =
+        document.getElementById(
+            "history"
+        );
 
-  const count =
-    document.getElementById(
-      "historyCount"
-    );
-
-
-  count.textContent =
-    attendanceHistory.length +
-    " siswa";
+    const count =
+        document.getElementById(
+            "historyCount"
+        );
 
 
-  if(!attendanceHistory.length){
-
-    list.innerHTML =
-      '<div class="empty-history">' +
-      'Belum ada siswa yang discan hari ini.' +
-      '</div>';
-
-    return;
-
-  }
+    count.textContent =
+        history.length +
+        " siswa";
 
 
-  list.innerHTML =
-    attendanceHistory.map(function(item){
+    if (!history.length) {
 
-      const duplicate =
-        item.duplicate === true;
+        container.innerHTML =
+            `
+            <div class="empty">
+                Belum ada absensi hari ini.
+            </div>
+            `;
 
-
-      return `
-
-        <div class="history-card ${duplicate ? "duplicate" : ""}">
-
-          <div class="history-name">
-            ${escapeHtml(
-              item.nama ||
-              "Nama tidak ditemukan"
-            )}
-          </div>
-
-          <div class="history-class">
-            ${escapeHtml(
-              item.kelas ||
-              "Kelas belum diketahui"
-            )}
-          </div>
-
-          <div class="history-nisn">
-            NISN: ${escapeHtml(
-              item.nisn
-            )}
-          </div>
-
-          <div class="history-time">
-            🕐 ${escapeHtml(
-              item.time || "-"
-            )}
-          </div>
-
-          <div class="history-status">
-            ${
-              duplicate
-              ? "⚠ SUDAH ABSEN"
-              : "✓ HADIR"
-            }
-          </div>
-
-        </div>
-
-      `;
-
-    }).join("");
-
-}
-
-
-/* ============================================================
-   CARI HISTORY
-============================================================ */
-
-function findHistoryItem(nisn){
-
-  return attendanceHistory.find(
-    function(item){
-
-      return String(item.nisn) ===
-             String(nisn);
+        return;
 
     }
-  );
+
+
+    container.innerHTML =
+        history
+            .map(item => {
+
+                const duplicate =
+                    item.duplicate === true;
+
+
+                return `
+                    <div
+                        class="history-item
+                        ${duplicate ? "duplicate" : ""}"
+                    >
+
+                        <div class="history-name">
+                            ${escapeHtml(
+                                item.nama
+                            )}
+                        </div>
+
+                        <div class="history-class">
+                            ${escapeHtml(
+                                item.kelas ||
+                                "Kelas belum diketahui"
+                            )}
+                        </div>
+
+                        <div class="history-info">
+                            NISN:
+                            ${escapeHtml(
+                                item.nisn
+                            )}
+                        </div>
+
+                        <div class="history-info">
+                            🕐
+                            ${escapeHtml(
+                                item.waktu ||
+                                "-"
+                            )}
+                        </div>
+
+                        <div class="history-status">
+                            ${
+                                duplicate
+                                ? "⚠ SUDAH ABSEN"
+                                : "✓ HADIR"
+                            }
+                        </div>
+
+                    </div>
+                `;
+
+            })
+            .join("");
 
 }
 
 
 /* ============================================================
-   TAMBAH HISTORY
-   ------------------------------------------------------------
-   PENTING:
-   Fungsi ini HANYA dipanggil setelah
-   ABSENSI_RESULT diterima.
-
-   Jadi tidak pernah lagi menyimpan:
-   nama:"Siswa"
+   SIMPAN HASIL ABSENSI
 ============================================================ */
 
-function addResultToHistory(data){
+function saveAttendanceResult(data) {
 
-  const nisn =
-    String(data.nisn || "").trim();
-
-
-  if(!nisn){
-    return;
-  }
+    if (!data) {
+        return;
+    }
 
 
-  const nama =
-    String(
-      data.nama || ""
-    ).trim();
+    const nisn =
+        String(
+            data.nisn || ""
+        ).trim();
 
 
-  /*
-   * Kalau backend belum memberikan nama,
-   * jangan masukkan ke history.
-   */
+    const nama =
+        String(
+            data.nama || ""
+        ).trim();
 
-  if(!nama){
-
-    console.warn(
-      "ABSENSI_RESULT tidak memiliki nama:",
-      data
-    );
-
-    return;
-
-  }
-
-
-  const kelas =
-    String(
-      data.kelas || ""
-    ).trim();
-
-
-  const waktu =
-    String(
-      data.waktu || ""
-    ).trim();
-
-
-  const existing =
-    findHistoryItem(nisn);
-
-
-  const record = {
-
-    nisn: nisn,
-
-    nama: nama,
-
-    kelas: kelas,
-
-    time:
-      waktu ||
-      new Date().toLocaleTimeString(
-        "id-ID",
-        {
-          hour:"2-digit",
-          minute:"2-digit",
-          second:"2-digit"
-        }
-      ),
-
-    status:
-      data.duplicate
-      ? "duplicate"
-      : (
-          data.status ||
-          "Hadir"
-        ),
-
-    message:
-      data.message || "",
-
-    duplicate:
-      !!data.duplicate
-
-  };
-
-
-  if(existing){
 
     /*
-     * Kalau sudah ada, update kartu lama.
+     * JANGAN memasukkan data kalau
+     * nama kosong.
+     *
+     * Ini yang mencegah kartu "Siswa".
      */
 
-    Object.assign(
-      existing,
-      record
-    );
+    if (!nisn || !nama) {
 
-  }else{
+        console.warn(
+            "Hasil absensi tidak lengkap:",
+            data
+        );
+
+        return;
+
+    }
+
+
+    const record = {
+
+        nisn: nisn,
+
+        nama: nama,
+
+        kelas:
+            String(
+                data.kelas || ""
+            ).trim(),
+
+        waktu:
+            String(
+                data.waktu || ""
+            ).trim(),
+
+        status:
+            data.status ||
+            "Hadir",
+
+        message:
+            data.message ||
+            "",
+
+        duplicate:
+            !!data.duplicate
+
+    };
+
 
     /*
-     * Kalau belum ada, baru masukkan
-     * nama siswa sebenarnya.
+     * Cari siswa berdasarkan NISN.
      */
 
-    attendanceHistory.unshift(
-      record
-    );
+    const index =
+        history.findIndex(
+            item =>
+                String(item.nisn) ===
+                nisn
+        );
 
-  }
+
+    if (index >= 0) {
+
+        /*
+         * Kalau sudah ada, update.
+         */
+
+        history[index] =
+            record;
+
+    } else {
+
+        /*
+         * Kalau belum ada, masukkan
+         * nama asli dari database.
+         */
+
+        history.unshift(
+            record
+        );
+
+    }
 
 
-  saveHistory();
+    saveHistory();
 
-  renderHistory();
+    renderHistory();
+
+}
+
+
+/* ============================================================
+   TAMPILKAN HASIL
+============================================================ */
+
+function showResult(data) {
+
+    const result =
+        document.getElementById(
+            "result"
+        );
+
+    const icon =
+        document.getElementById(
+            "resultIcon"
+        );
+
+    const name =
+        document.getElementById(
+            "resultName"
+        );
+
+    const kelas =
+        document.getElementById(
+            "resultClass"
+        );
+
+    const waktu =
+        document.getElementById(
+            "resultTime"
+        );
+
+    const message =
+        document.getElementById(
+            "resultMessage"
+        );
+
+
+    result.className =
+        "result";
+
+
+    if (data.duplicate) {
+
+        result.classList.add(
+            "warning"
+        );
+
+        icon.textContent =
+            "⚠";
+
+    } else if (!data.success) {
+
+        result.classList.add(
+            "error"
+        );
+
+        icon.textContent =
+            "✕";
+
+    } else {
+
+        icon.textContent =
+            "✓";
+
+    }
+
+
+    name.textContent =
+        data.nama ||
+        "Nama siswa tidak ditemukan";
+
+
+    kelas.textContent =
+        data.kelas
+            ? "Kelas " + data.kelas
+            : "";
+
+
+    waktu.textContent =
+        data.waktu
+            ? "🕐 " + data.waktu
+            : "";
+
+
+    message.textContent =
+        data.message ||
+        (
+            data.success
+                ? "Absensi berhasil."
+                : "Absensi gagal."
+        );
+
+
+    result.style.display =
+        "block";
+
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+function setStatus(
+    text,
+    detail
+) {
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        text || "";
+
+
+    document.getElementById(
+        "statusDetail"
+    ).textContent =
+        detail || "";
+
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+function showError(message) {
+
+    const error =
+        document.getElementById(
+            "error"
+        );
+
+
+    error.textContent =
+        message;
+
+
+    error.style.display =
+        "block";
+
+
+    document.getElementById(
+        "retry"
+    ).style.display =
+        "block";
+
+}
+
+
+function clearError() {
+
+    document.getElementById(
+        "error"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "retry"
+    ).style.display =
+        "none";
 
 }
 
@@ -1014,68 +1061,379 @@ function addResultToHistory(data){
    AMBIL NISN DARI QR
 ============================================================ */
 
-function getNisn(raw){
+function extractNisn(decodedText) {
 
-  const text =
-    String(raw || "").trim();
-
-
-  if(!text){
-    return "";
-  }
+    const text =
+        String(
+            decodedText || ""
+        ).trim();
 
 
-  try{
+    if (!text) {
+        return "";
+    }
 
-    const url =
-      new URL(text);
+
+    /*
+     * Kalau QR berisi URL:
+     *
+     * https://...?...nisn=123
+     *
+     * ambil parameter nisn.
+     */
+
+    try {
+
+        const url =
+            new URL(text);
 
 
-    return String(
-      url.searchParams.get("nisn") ||
-      url.searchParams.get("NISN") ||
-      text
-    ).trim();
+        const nisn =
+            url.searchParams.get("nisn") ||
+            url.searchParams.get("NISN");
 
-  }catch(error){
+
+        if (nisn) {
+            return nisn.trim();
+        }
+
+    } catch (e) {
+
+        /*
+         * Kalau bukan URL,
+         * anggap langsung sebagai NISN.
+         */
+
+    }
+
 
     return text;
-
-  }
 
 }
 
 
 /* ============================================================
-   STOP SCANNER
+   SCAN QR
 ============================================================ */
 
-async function stopScanner(){
+function onScanSuccess(decodedText) {
 
-  const scanner =
-    qrScanner;
+    /*
+     * Jangan memproses QR berulang
+     * selama hasil sebelumnya belum kembali.
+     */
 
-  qrScanner =
-    null;
-
-
-  if(!scanner){
-    return;
-  }
+    if (sedangMemproses) {
+        return;
+    }
 
 
-  try{
+    const nisn =
+        extractNisn(
+            decodedText
+        );
 
-    await scanner.stop();
 
-  }catch(error){}
+    if (!nisn) {
+        return;
+    }
 
 
-  try{
+    sedangMemproses =
+        true;
 
-    scanner.clear();
 
-  }catch(error){}
+    clearError();
+
+
+    /*
+     * Tampilkan sementara hanya:
+     *
+     * QR berhasil dibaca.
+     *
+     * JANGAN memasukkan "Siswa"
+     * ke history.
+     */
+
+    setStatus(
+        "QR berhasil dibaca ✓",
+        "Memeriksa data siswa..."
+    );
+
+
+    showResult({
+
+        success: true,
+
+        nama: "Memproses...",
+
+        kelas: "",
+
+        waktu: "",
+
+        message:
+            "NISN " +
+            nisn +
+            " sedang diperiksa..."
+
+    });
+
+
+    /*
+     * ========================================================
+     * INI KOMUNIKASI KE index.html
+     * ========================================================
+     *
+     * index.html kamu memang menunggu:
+     *
+     * type: "ABSENSI_QR"
+     *
+     * lalu memanggil Code.gs.
+     */
+
+    try {
+
+        if (
+            window.opener &&
+            !window.opener.closed
+        ) {
+
+            window.opener.postMessage(
+
+                {
+                    type:
+                        "ABSENSI_QR",
+
+                    value:
+                        nisn
+                },
+
+                "*"
+
+            );
+
+
+            setStatus(
+                "Memeriksa siswa...",
+                "Menunggu hasil dari aplikasi utama."
+            );
+
+
+        } else {
+
+            /*
+             * Kalau opener hilang,
+             * hasil memang tidak akan pernah kembali.
+             */
+
+            showError(
+                "Scanner tidak terhubung dengan aplikasi utama. " +
+                "Tutup scanner lalu buka kembali melalui tombol Scan QR."
+            );
+
+
+            setStatus(
+                "Koneksi aplikasi utama tidak ditemukan.",
+                "Buka scanner dari aplikasi absensi."
+            );
+
+
+            sedangMemproses =
+                false;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Gagal mengirim QR:",
+            error
+        );
+
+
+        showError(
+            "Gagal mengirim data QR ke aplikasi utama."
+        );
+
+
+        sedangMemproses =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   TERIMA HASIL DARI index.html
+============================================================ */
+
+window.addEventListener(
+    "message",
+    function(event) {
+
+        if (
+            !event ||
+            !event.data
+        ) {
+            return;
+        }
+
+
+        const data =
+            event.data;
+
+
+        /*
+         * Kita hanya menerima pesan:
+         *
+         * ABSENSI_RESULT
+         */
+
+        if (
+            data.type !==
+            "ABSENSI_RESULT"
+        ) {
+
+            return;
+
+        }
+
+
+        console.log(
+            "ABSENSI_RESULT diterima:",
+            data
+        );
+
+
+        /*
+         * ====================================================
+         * HASIL SUDAH KEMBALI
+         * ====================================================
+         */
+
+        sedangMemproses =
+            false;
+
+
+        /*
+         * Simpan HANYA kalau nama
+         * memang dikirim.
+         */
+
+        if (
+            data.nama &&
+            String(data.nama).trim()
+        ) {
+
+            saveAttendanceResult(
+                data
+            );
+
+        }
+
+
+        /*
+         * Tampilkan hasil lengkap.
+         */
+
+        showResult(
+            data
+        );
+
+
+        /*
+         * DUPLICATE
+         */
+
+        if (data.duplicate) {
+
+            setStatus(
+                "⚠ Siswa sudah absen",
+                data.message ||
+                (
+                    data.nama
+                        ? data.nama +
+                          " sudah tercatat."
+                        : "Sudah tercatat."
+                )
+            );
+
+
+        /*
+         * BERHASIL
+         */
+
+        } else if (data.success) {
+
+            setStatus(
+                "✓ Absensi berhasil",
+                (
+                    data.nama ||
+                    "Siswa"
+                ) +
+                (
+                    data.waktu
+                        ? " • " +
+                          data.waktu
+                        : ""
+                )
+            );
+
+
+        /*
+         * GAGAL
+         */
+
+        } else {
+
+            setStatus(
+                "✕ Absensi gagal",
+                data.message ||
+                "Data tidak dapat diproses."
+            );
+
+        }
+
+    },
+    false
+);
+
+
+/* ============================================================
+   NOTIFIKASI SCANNER SIAP
+============================================================ */
+
+function notifyReady() {
+
+    try {
+
+        if (
+            window.opener &&
+            !window.opener.closed
+        ) {
+
+            window.opener.postMessage(
+
+                {
+                    type:
+                        "ABSENSI_SCANNER_READY"
+                },
+
+                "*"
+
+            );
+
+        }
+
+    } catch (e) {
+
+        console.warn(
+            "Tidak dapat mengirim status ready:",
+            e
+        );
+
+    }
 
 }
 
@@ -1084,665 +1442,267 @@ async function stopScanner(){
    START SCANNER
 ============================================================ */
 
-async function startScanner(){
+async function startScanner() {
 
-  processing =
-    false;
-
-
-  clearError();
-
-
-  document.getElementById(
-    "result"
-  ).style.display =
-    "none";
-
-
-  setStatus(
-    "Membuka kamera...",
-    "Izinkan akses kamera jika diminta."
-  );
-
-
-  await stopScanner();
-
-
-  if(typeof Html5Qrcode !== "function"){
-
-    showError(
-      "Library scanner gagal dimuat. " +
-      "Pastikan internet aktif lalu tekan Coba Lagi."
-    );
-
-    return;
-
-  }
-
-
-  const scanner =
-    new Html5Qrcode(
-      "reader"
-    );
-
-
-  qrScanner =
-    scanner;
-
-
-  const config = {
-
-    fps:10,
-
-    qrbox:function(w,h){
-
-      const size =
-        Math.max(
-          180,
-          Math.floor(
-            Math.min(w,h) * 0.7
-          )
-        );
-
-
-      return {
-
-        width:size,
-
-        height:size
-
-      };
-
-    }
-
-  };
-
-
-  /*
-   * Kamera belakang terlebih dahulu.
-   */
-
-  try{
-
-    await scanner.start(
-
-      {
-        facingMode:"environment"
-      },
-
-      config,
-
-      onScan,
-
-      function(){}
-
-    );
-
-
-    if(qrScanner === scanner){
-
-      setStatus(
-        "Kamera siap",
-        "Arahkan QR siswa ke kotak scanner."
-      );
-
-    }
-
-    return;
-
-  }catch(firstError){
-
-    console.warn(
-      "Kamera environment gagal:",
-      firstError
-    );
-
-  }
-
-
-  /*
-   * Fallback ke daftar kamera.
-   */
-
-  try{
-
-    const cameras =
-      await Html5Qrcode.getCameras();
-
-
-    if(
-      !cameras ||
-      !cameras.length
-    ){
-
-      throw new Error(
-        "NotFoundError"
-      );
-
-    }
-
-
-    await scanner.start(
-
-      cameras[0].id,
-
-      config,
-
-      onScan,
-
-      function(){}
-
-    );
-
-
-    if(qrScanner === scanner){
-
-      setStatus(
-        "Kamera siap",
-        "Arahkan QR siswa ke kotak scanner."
-      );
-
-    }
-
-  }catch(error){
-
-    const msg =
-      String(
-        error &&
-        (
-          error.message ||
-          error.name
-        ) ||
-        error ||
-        ""
-      );
-
-
-    if(
-      /NotAllowed|Permission|denied/i
-      .test(msg)
-    ){
-
-      showError(
-        "Akses kamera ditolak. " +
-        "Izinkan kamera untuk halaman scanner ini lalu tekan Coba Lagi."
-      );
-
-    }else if(
-      /NotFound|No camera/i
-      .test(msg)
-    ){
-
-      showError(
-        "Kamera tidak ditemukan pada perangkat."
-      );
-
-    }else{
-
-      showError(
-        "Kamera tidak dapat dibuka. " +
-        "Pastikan scanner dibuka melalui HTTPS."
-      );
-
-      console.error(
-        "Detail kamera:",
-        error
-      );
-
-    }
-
-  }
-
-}
-
-
-/* ============================================================
-   HASIL SCAN QR
-============================================================ */
-
-async function onScan(decodedText){
-
-  if(processing){
-    return;
-  }
-
-
-  const nisn =
-    getNisn(decodedText);
-
-
-  if(!nisn){
-    return;
-  }
-
-
-  processing =
-    true;
-
-
-  /*
-   * PENTING:
-   *
-   * TIDAK ADA addHistory(nisn) DI SINI.
-   *
-   * Scanner hanya mengirim NISN.
-   *
-   * History baru dibuat ketika index.html
-   * mengirim ABSENSI_RESULT.
-   */
-
-
-  showResult(
-    "success",
-    "QR berhasil dibaca",
-    "NISN: " + nisn +
-    " • Menunggu hasil absensi..."
-  );
-
-
-  setStatus(
-    "Memproses absensi...",
-    "Mencari nama siswa..."
-  );
-
-
-  /*
-   * Kirim NISN ke index.html.
-   */
-
-  if(
-    window.opener &&
-    !window.opener.closed
-  ){
-
-    try{
-
-      window.opener.postMessage(
-
-        {
-          type:"ABSENSI_QR",
-          value:nisn
-        },
-
-        "*"
-
-      );
-
-
-      setStatus(
-        "QR berhasil dibaca ✓",
-        "Menunggu nama dan hasil absensi..."
-      );
-
-
-    }catch(error){
-
-      console.error(
-        "Gagal mengirim NISN ke index:",
-        error
-      );
-
-
-      showResult(
-        "error",
-        "QR terbaca",
-        "Gagal mengirim data ke aplikasi utama."
-      );
-
-
-      setStatus(
-        "Komunikasi gagal",
-        "Silakan buka scanner dari halaman utama."
-      );
-
-
-      processing =
-        false;
-
-    }
-
-
-  }else{
-
-    /*
-     * Scanner dibuka langsung tanpa index sebagai opener.
-     */
-
-    showResult(
-      "error",
-      "Scanner dibuka langsung",
-      "Buka scanner melalui tombol Scan QR pada halaman utama."
-    );
+    clearError();
 
 
     setStatus(
-      "Scanner tidak terhubung",
-      "Kembali ke aplikasi utama lalu buka scanner dari sana."
+        "Menyiapkan kamera...",
+        "Mohon izinkan akses kamera."
     );
 
 
-    processing =
-      false;
-
-  }
-
-}
-
-
-/* ============================================================
-   TERIMA HASIL DARI INDEX.HTML
-============================================================ */
-
-window.addEventListener(
-  "message",
-  function(event){
-
-    if(
-      !event ||
-      !event.data ||
-      event.data.type !==
-        "ABSENSI_RESULT"
-    ){
-
-      return;
-
-    }
-
-
-    const data =
-      event.data;
-
-
-    const nisn =
-      String(
-        data.nisn || ""
-      ).trim();
-
-
-    if(!nisn){
-
-      processing =
-        false;
-
-      return;
-
-    }
-
-
-    /*
-     * ========================================================
-     * INI TITIK UTAMA PERBAIKAN
-     * ========================================================
-     *
-     * Nama siswa sekarang berasal dari:
-     *
-     * data.nama
-     *
-     * yang dikirim oleh index.html setelah
-     * Code.gs mencari NISN.
-     */
-
-    addResultToHistory(
-      data
-    );
-
-
-    /*
-     * DUPLICATE
-     */
-
-    if(data.duplicate){
-
-      showResult(
-
-        "warning",
-
-        "⚠ Sudah Absen",
-
-        (
-          data.nama
-            ? data.nama
-            : "Siswa"
-        ) +
-        (
-          data.kelas
-            ? " • " + data.kelas
-            : ""
-        ) +
-        (
-          data.waktu
-            ? " • " + data.waktu
-            : ""
-        )
-
-      );
-
-
-      setStatus(
-
-        "⚠ Sudah Absen",
-
-        data.message ||
-        "Siswa ini sudah tercatat hari ini."
-
-      );
-
-
-    /*
-     * BERHASIL
-     */
-
-    }else if(data.success){
-
-      showResult(
-
-        "success",
-
-        (
-          data.nama ||
-          "Nama siswa"
-        ) +
-        (
-          data.kelas
-            ? " • " + data.kelas
-            : ""
-        ),
-
-        data.message ||
-        (
-          data.waktu
-            ? "Absensi pukul " +
-              data.waktu
-            : "Absensi berhasil dicatat."
-        )
-
-      );
-
-
-      setStatus(
-
-        "✓ Absensi berhasil",
-
-        "Nama siswa sudah ditampilkan. Kamera tetap aktif."
-
-      );
-
-
-    /*
-     * GAGAL
-     */
-
-    }else{
-
-      showResult(
-
-        "error",
-
-        "Absensi gagal",
-
-        data.message ||
-        "Terjadi kesalahan saat mencatat absensi."
-
-      );
-
-
-      setStatus(
-
-        "QR terbaca",
-
-        "Periksa pesan hasil absensi."
-
-      );
-
-    }
-
-
-    /*
-     * Sudah selesai memproses QR.
-     * Kamera tetap hidup.
-     */
-
-    processing =
-      false;
-
-  }
-);
-
-
-/* ============================================================
-   TOMBOL RETRY
-============================================================ */
-
-document
-  .getElementById("retry")
-  .addEventListener(
-    "click",
-    function(){
-
-      startScanner();
-
-    }
-  );
-
-
-/* ============================================================
-   TOMBOL KEMBALI
-============================================================ */
-
-document
-  .getElementById("back")
-  .addEventListener(
-    "click",
-    async function(){
-
-      await stopScanner();
-
-
-      if(
-        window.opener &&
-        !window.opener.closed
-      ){
-
-        try{
-
-          window.close();
-
-        }catch(error){}
-
-      }else{
-
-        /*
-         * Jika scanner bukan popup,
-         * cukup kembali satu halaman.
-         */
-
-        if(
-          window.history.length > 1
-        ){
-
-          window.history.back();
+    try {
+
+        if (
+            typeof Html5Qrcode ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "Library QR scanner belum dimuat."
+            );
 
         }
 
-      }
+
+        scanner =
+            new Html5Qrcode(
+                "reader"
+            );
+
+
+        const config = {
+
+            fps: 10,
+
+            qrbox:
+                function(
+                    width,
+                    height
+                ) {
+
+                    const size =
+                        Math.floor(
+                            Math.min(
+                                width,
+                                height
+                            ) * .7
+                        );
+
+
+                    return {
+
+                        width:
+                            Math.max(
+                                180,
+                                size
+                            ),
+
+                        height:
+                            Math.max(
+                                180,
+                                size
+                            )
+
+                    };
+
+                }
+
+        };
+
+
+        /*
+         * Utamakan kamera belakang.
+         */
+
+        await scanner.start(
+
+            {
+                facingMode:
+                    "environment"
+            },
+
+            config,
+
+            onScanSuccess,
+
+            function() {}
+
+        );
+
+
+        setStatus(
+            "Kamera siap ✓",
+            "Arahkan QR siswa ke kotak scanner."
+        );
+
+
+        notifyReady();
+
+
+    } catch (firstError) {
+
+        console.warn(
+            "Kamera belakang gagal:",
+            firstError
+        );
+
+
+        /*
+         * Fallback.
+         */
+
+        try {
+
+            const cameras =
+                await Html5Qrcode.getCameras();
+
+
+            if (
+                !cameras ||
+                !cameras.length
+            ) {
+
+                throw new Error(
+                    "Kamera tidak ditemukan."
+                );
+
+            }
+
+
+            scanner =
+                new Html5Qrcode(
+                    "reader"
+                );
+
+
+            await scanner.start(
+
+                cameras[0].id,
+
+                {
+                    fps: 10,
+
+                    qrbox:
+                        function(
+                            width,
+                            height
+                        ) {
+
+                            const size =
+                                Math.floor(
+                                    Math.min(
+                                        width,
+                                        height
+                                    ) * .7
+                                );
+
+
+                            return {
+
+                                width:
+                                    Math.max(
+                                        180,
+                                        size
+                                    ),
+
+                                height:
+                                    Math.max(
+                                        180,
+                                        size
+                                    )
+
+                            };
+
+                        }
+
+                },
+
+                onScanSuccess,
+
+                function() {}
+
+            );
+
+
+            setStatus(
+                "Kamera siap ✓",
+                "Arahkan QR siswa ke kotak scanner."
+            );
+
+
+            notifyReady();
+
+
+        } catch (error) {
+
+            console.error(
+                "Kamera gagal:",
+                error
+            );
+
+
+            showError(
+                "Kamera tidak dapat dibuka. " +
+                "Pastikan izin kamera diberikan."
+            );
+
+
+            setStatus(
+                "Kamera gagal dibuka",
+                "Tekan Coba Lagi."
+            );
+
+        }
 
     }
-  );
-
-
-/* ============================================================
-   JIKA TANGGAL BERGANTI
-============================================================ */
-
-setInterval(
-  function(){
-
-    const newToday =
-      getTodayKey();
-
-
-    if(
-      newToday !== todayKey
-    ){
-
-      todayKey =
-        newToday;
-
-
-      historyKey =
-        "absensi_history_" +
-        todayKey;
-
-
-      attendanceHistory =
-        loadHistory();
-
-
-      renderHistory();
-
-    }
-
-  },
-  60000
-);
-
-
-/* ============================================================
-   BERI TAHU INDEX BAHWA SCANNER SIAP
-============================================================ */
-
-function notifyScannerReady(){
-
-  if(
-    window.opener &&
-    !window.opener.closed
-  ){
-
-    try{
-
-      window.opener.postMessage(
-
-        {
-          type:
-            "ABSENSI_SCANNER_READY"
-        },
-
-        "*"
-
-      );
-
-    }catch(error){
-
-      console.warn(
-        "Gagal memberi tahu index:",
-        error
-      );
-
-    }
-
-  }
 
 }
+
+
+/* ============================================================
+   RETRY
+============================================================ */
+
+document
+    .getElementById("retry")
+    .addEventListener(
+        "click",
+        async function() {
+
+            try {
+
+                if (scanner) {
+
+                    await scanner.stop();
+
+                    scanner.clear();
+
+                }
+
+            } catch (e) {}
+
+
+            scanner =
+                null;
+
+
+            sedangMemproses =
+                false;
+
+
+            document.getElementById(
+                "result"
+            ).style.display =
+                "none";
+
+
+            startScanner();
+
+        }
+    );
 
 
 /* ============================================================
@@ -1751,7 +1711,7 @@ function notifyScannerReady(){
 
 renderHistory();
 
-notifyScannerReady();
+notifyReady();
 
 startScanner();
 
