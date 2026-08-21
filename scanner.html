@@ -4,84 +4,304 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scanner Absensi - SDN 8 Mentok</title>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
+    </script>
     <style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        html,body{width:100%;min-height:100%}
-        body{font-family:Arial,Helvetica,sans-serif;background:#05060a;color:#fff}
-        .container{width:100%;max-width:520px;margin:auto;padding:14px}
-        .header{text-align:center;margin-bottom:12px}
-        .title{font-size:21px;font-weight:800}
-        .subtitle{color:#94a3b8;font-size:11px;margin-top:4px}
-        .card{background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:9px;box-shadow:0 15px 35px rgba(0,0,0,.35)}
-        #reader{width:100%}
-        #reader video{width:100%!important;height:auto!important;border-radius:12px!important;object-fit:cover}
-        #reader__dashboard{padding-top:8px!important}
-        #reader__dashboard button{background:linear-gradient(135deg,#dc2626,#2563eb)!important;color:#fff!important;border:0!important;border-radius:8px!important;font-weight:700!important}
-        #reader__dashboard select{background:#111827!important;color:#fff!important;border-radius:8px!important}
-        .status{margin-top:10px;padding:12px;border-radius:13px;text-align:center;background:#0f172a;border:1px solid rgba(255,255,255,.08)}
-        #status{font-size:13px;font-weight:800}
-        #detail{margin-top:4px;color:#94a3b8;font-size:10px}
-        .result{display:none;margin-top:10px;padding:15px;text-align:center;border-radius:14px;background:#0f172a;border:1px solid rgba(34,197,94,.35)}
-        .result.warning{border-color:rgba(245,158,11,.45)}
-        .result.error{border-color:rgba(239,68,68,.45)}
-        .icon{font-size:30px}
-        .name{margin-top:4px;font-size:17px;font-weight:800}
-        .class{margin-top:3px;font-size:12px;color:#cbd5e1}
-        .time{margin-top:4px;font-size:11px;color:#94a3b8}
-        .message{margin-top:8px;font-size:12px;font-weight:700}
-        .history{margin-top:10px;padding:11px;background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:15px}
-        .history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-        .history-title{font-size:14px;font-weight:800}
-        .history-count{font-size:10px;color:#94a3b8}
-        #historyList{display:flex;flex-direction:column;gap:7px;max-height:300px;overflow-y:auto}
-        .history-item{padding:9px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)}
-        .history-item.duplicate{border-color:rgba(245,158,11,.35)}
-        .history-name{font-size:12px;font-weight:800}
-        .history-class,.history-info{margin-top:3px;font-size:10px;color:#94a3b8}
-        .badge{display:inline-block;margin-top:5px;padding:3px 6px;border-radius:5px;font-size:9px;font-weight:800;background:rgba(34,197,94,.12);color:#86efac}
-        .duplicate .badge{background:rgba(245,158,11,.12);color:#fcd34d}
-        .empty{text-align:center;padding:15px;color:#64748b;font-size:11px}
-        #error{display:none;margin-top:8px;padding:9px;border-radius:9px;text-align:center;font-size:11px;color:#fecaca;background:rgba(127,29,29,.35);border:1px solid rgba(248,113,113,.25)}
-        #retry{display:none;width:100%;margin-top:7px;padding:10px;border:0;border-radius:9px;color:#fff;font-weight:700;background:linear-gradient(135deg,#dc2626,#2563eb);cursor:pointer}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0f172a;
+            color: #fff;
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            max-width: 480px;
+            width: 100%;
+        }
 
-        /* TOMBOL KAMERA DEPAN/BELAKANG */
-        .btn-camera-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-        .btn-cam{padding:10px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s}
-        .btn-cam:hover{transform:translateY(-2px)}
-        .btn-cam:active{transform:translateY(0)}
-        .btn-rear{background:linear-gradient(135deg,#059669,#047857);color:#fff}
-        .btn-front{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff}
-        .btn-stop{background:rgba(220,38,38,0.20);color:#fca5a5;border:1px solid rgba(220,38,38,0.30);padding:8px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;width:100%;margin-top:6px}
-        .btn-stop:hover{background:rgba(220,38,38,0.35)}
-        .status-led{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-        .status-led.on{background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,0.50)}
-        .status-led.off{background:#64748b}
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .header p {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        #reader {
+            width: 100%;
+        }
+        #reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 12px !important;
+            aspect-ratio: 1/1 !important;
+            object-fit: cover !important;
+            background: #000;
+        }
+
+        /* TOMBOL KAMERA - TANPA ICON */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .btn-group button {
+            padding: 14px 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fff;
+        }
+        .btn-group button:active {
+            transform: scale(0.96);
+        }
+        .btn-belakang {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+        .btn-belakang:hover {
+            box-shadow: 0 6px 25px rgba(5, 150, 105, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-depan {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        .btn-depan:hover {
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-stop {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-stop:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .status-box {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+        .status-box .status {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .status-box .detail {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .status-led {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .status-led.on {
+            background: #4ade80;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.5);
+        }
+        .status-led.off {
+            background: #475569;
+        }
+
+        .result {
+            display: none;
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            background: #1e293b;
+            text-align: center;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .result.success {
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+        .result.duplicate {
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+        .result.error {
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        .result .nama {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        .result .kelas {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .result .waktu {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .result .pesan {
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .history {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .history-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .history-header span {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        #historyList {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .history-item .h-nama {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .history-item .h-info {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .history-item .h-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+        }
+        .history-item.duplicate .h-badge {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+        }
+        .history-empty {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        #error {
+            display: none;
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(127, 29, 29, 0.35);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+            color: #fca5a5;
+            font-size: 12px;
+            text-align: center;
+        }
+        #retry {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #dc2626, #2563eb);
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        #retry:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+
     <div class="header">
-        <div class="title">📷 Scan QR Kehadiran</div>
-        <div class="subtitle">SD Negeri 8 Mentok</div>
+        <h1>📷 Scan QR Kehadiran</h1>
+        <p>SD Negeri 8 Mentok</p>
     </div>
 
     <div class="card">
         <div id="reader"></div>
     </div>
 
-    <!-- TOMBOL KAMERA -->
-    <div class="btn-camera-group">
-        <button class="btn-cam btn-rear" id="btnRear">📷 Belakang</button>
-        <button class="btn-cam btn-front" id="btnFront">🤳 Depan</button>
+    <!-- TOMBOL KAMERA - TANPA ICON, JELAS -->
+    <div class="btn-group">
+        <button class="btn-belakang" id="btnRear">Kamera Belakang</button>
+        <button class="btn-depan" id="btnFront">Kamera Depan</button>
     </div>
-    <button class="btn-stop" id="btnStop">⏹ Stop Scanner</button>
 
-    <div class="status">
-        <div id="status">Menyiapkan kamera...</div>
-        <div id="detail">Mohon izinkan akses kamera.</div>
-        <div style="margin-top:6px;font-size:10px;color:#475569">
+    <button class="btn-stop" id="btnStop">Stop Scanner</button>
+
+    <div class="status-box">
+        <div class="status" id="status">Menyiapkan kamera...</div>
+        <div class="detail" id="detail">Mohon izinkan akses kamera.</div>
+        <div style="margin-top:6px; font-size:11px; color:#64748b;">
             <span class="status-led off" id="statusLed"></span>
             <span id="statusText">Kamera mati</span>
         </div>
@@ -91,354 +311,375 @@
     <button id="retry">Coba Lagi</button>
 
     <div id="result" class="result">
-        <div id="resultIcon" class="icon">✓</div>
-        <div id="resultName" class="name"></div>
-        <div id="resultClass" class="class"></div>
-        <div id="resultTime" class="time"></div>
-        <div id="resultMessage" class="message"></div>
+        <div id="resultIcon" style="font-size:28px;">✅</div>
+        <div class="nama" id="resultName"></div>
+        <div class="kelas" id="resultClass"></div>
+        <div class="waktu" id="resultTime"></div>
+        <div class="pesan" id="resultMessage"></div>
     </div>
 
     <div class="history">
         <div class="history-header">
-            <div class="history-title">📋 Absensi Hari Ini</div>
-            <div id="historyCount" class="history-count">0 siswa</div>
+            <h3>📋 Absensi Hari Ini</h3>
+            <span id="historyCount">0 siswa</span>
         </div>
-        <div id="historyList"></div>
+        <div id="historyList">
+            <div class="history-empty">Belum ada absensi hari ini.</div>
+        </div>
     </div>
+
 </div>
 
 <script>
-/* ==========================================================
-   VARIABEL
-========================================================== */
-let qrScanner = null;
-let processing = false;
-let lastNisn = "";
-let lastSendTime = 0;
-let waitingTimer = null;
-let currentFacingMode = 'environment';
+    // ============================================================
+    // VARIABEL
+    // ============================================================
+    let qrScanner = null;
+    let processing = false;
+    let lastNisn = "";
+    let lastSendTime = 0;
+    let waitingTimer = null;
+    let currentMode = 'environment';
 
-/* ==========================================================
-   STORAGE
-========================================================== */
-function todayKey(){
-    const d = new Date();
-    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-}
-
-const STORAGE_KEY = "absensi_scanner_" + todayKey();
-let history = loadHistory();
-
-function loadHistory(){
-    try{
-        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        if(!Array.isArray(data)) return [];
-        return data.filter(item => item && item.nisn && item.nama && item.nama !== "Siswa");
-    }catch(e){ return []; }
-}
-
-function saveHistory(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-}
-
-function esc(v){ const d=document.createElement('div'); d.textContent=v==null?'':String(v); return d.innerHTML; }
-
-/* ==========================================================
-   RENDER HISTORY
-========================================================== */
-function renderHistory(){
-    const list = document.getElementById("historyList");
-    const count = document.getElementById("historyCount");
-    count.textContent = history.length + " siswa";
-    if(history.length === 0){
-        list.innerHTML = `<div class="empty">Belum ada absensi hari ini.</div>`;
-        return;
+    // ============================================================
+    // STORAGE
+    // ============================================================
+    function getToday() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
-    list.innerHTML = history.map(item => `
-        <div class="history-item ${item.duplicate ? 'duplicate' : ''}">
-            <div class="history-name">${esc(item.nama)}</div>
-            <div class="history-class">${esc(item.kelas || "")}</div>
-            <div class="history-info">NISN: ${esc(item.nisn)}</div>
-            <div class="history-info">🕐 ${esc(item.waktu || "-")}</div>
-            <span class="badge">${item.duplicate ? '⚠ SUDAH ABSEN' : '✓ HADIR'}</span>
-        </div>
-    `).join("");
-}
 
-/* ==========================================================
-   STATUS
-========================================================== */
-function setStatus(text, detail){
-    document.getElementById("status").textContent = text || "";
-    document.getElementById("detail").textContent = detail || "";
-}
+    const STORAGE_KEY = 'absensi_scanner_' + getToday();
+    let history = loadHistory();
 
-function setLed(isOn){
-    const led = document.getElementById('statusLed');
-    const txt = document.getElementById('statusText');
-    led.className = 'status-led ' + (isOn ? 'on' : 'off');
-    txt.textContent = isOn ? 'Kamera menyala' : 'Kamera mati';
-}
-
-function showError(text){
-    const el = document.getElementById("error");
-    el.textContent = text;
-    el.style.display = "block";
-    document.getElementById("retry").style.display = "block";
-}
-
-function clearError(){
-    document.getElementById("error").style.display = "none";
-    document.getElementById("retry").style.display = "none";
-}
-
-/* ==========================================================
-   RESULT
-========================================================== */
-function showResult(data){
-    const box = document.getElementById("result");
-    box.className = "result";
-    const icon = document.getElementById("resultIcon");
-    if(data.duplicate){ box.classList.add("warning"); icon.textContent = "⚠"; }
-    else if(!data.success){ box.classList.add("error"); icon.textContent = "✕"; }
-    else { icon.textContent = "✓"; }
-    document.getElementById("resultName").textContent = data.nama || "Nama siswa tidak ditemukan";
-    document.getElementById("resultClass").textContent = data.kelas ? "Kelas " + data.kelas : "";
-    document.getElementById("resultTime").textContent = data.waktu ? "🕐 " + data.waktu : "";
-    document.getElementById("resultMessage").textContent = data.message || "";
-    box.style.display = "block";
-}
-
-/* ==========================================================
-   SIMPAN HASIL
-========================================================== */
-function saveResult(data){
-    if(!data || !data.nisn || !data.nama || String(data.nama).trim() === "") return;
-    const nisn = String(data.nisn).trim();
-    const record = {
-        nisn: nisn,
-        nama: String(data.nama).trim(),
-        kelas: String(data.kelas || "").trim(),
-        waktu: String(data.waktu || "").trim(),
-        status: data.status || "Hadir",
-        message: data.message || "",
-        duplicate: !!data.duplicate
-    };
-    const index = history.findIndex(item => String(item.nisn) === nisn);
-    if(index >= 0) history[index] = record;
-    else history.unshift(record);
-    saveHistory();
-    renderHistory();
-}
-
-/* ==========================================================
-   AMBIL NISN
-========================================================== */
-function getNisn(text){
-    text = String(text || "").trim();
-    if(!text) return "";
-    try{
-        const url = new URL(text);
-        const nisn = url.searchParams.get("nisn") || url.searchParams.get("NISN");
-        if(nisn) return nisn.trim();
-    }catch(e){}
-    return text;
-}
-
-/* ==========================================================
-   KIRIM KE INDEX
-========================================================== */
-function sendToIndex(nisn){
-    if(!window.opener || window.opener.closed){
-        showError("Aplikasi utama tidak terhubung. Tutup scanner dan buka kembali dari tombol Scan QR.");
-        setStatus("Koneksi tidak ditemukan", "Scanner harus dibuka dari aplikasi absensi.");
-        processing = false;
-        return false;
+    function loadHistory() {
+        try {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            return Array.isArray(data) ? data.filter(item => item && item.nisn && item.nama) : [];
+        } catch (e) { return []; }
     }
-    try{
-        window.opener.postMessage({ type: "ABSENSI_QR", value: nisn, time: Date.now() }, "*");
-        console.log("ABSENSI_QR TERKIRIM:", nisn);
-        return true;
-    }catch(error){
-        console.error("POSTMESSAGE ERROR:", error);
-        showError("Gagal mengirim QR ke aplikasi utama.");
-        processing = false;
-        return false;
+
+    function saveHistory() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
     }
-}
 
-/* ==========================================================
-   SCAN SUCCESS
-========================================================== */
-function onScanSuccess(decodedText){
-    if(processing) return;
-    const nisn = getNisn(decodedText);
-    if(!nisn) return;
-
-    const now = Date.now();
-    if(nisn === lastNisn && now - lastSendTime < 2000) return;
-
-    lastNisn = nisn;
-    lastSendTime = now;
-    processing = true;
-    clearError();
-    document.getElementById("result").style.display = "none";
-    setStatus("QR berhasil dibaca ✓", "Mengirim NISN ke aplikasi utama...");
-
-    const sent = sendToIndex(nisn);
-    if(!sent) return;
-
-    setStatus("QR terkirim ✓", "Aplikasi utama sedang mencari nama siswa...");
-
-    clearTimeout(waitingTimer);
-    waitingTimer = setTimeout(function(){
-        if(!processing) return;
-        setStatus("Belum menerima jawaban", "Pesan sudah dikirim. Periksa aplikasi utama.");
-        showError("Aplikasi utama belum mengirim hasil absensi. Coba tutup scanner dan buka kembali dari aplikasi utama.");
-        processing = false;
-    }, 10000);
-}
-
-/* ==========================================================
-   TERIMA HASIL DARI INDEX
-========================================================== */
-window.addEventListener("message", function(event){
-    console.log("MESSAGE MASUK KE SCANNER:", event.data);
-    if(!event || !event.data) return;
-    if(event.data.type !== "ABSENSI_RESULT") return;
-
-    clearTimeout(waitingTimer);
-    processing = false;
-    const data = event.data;
-    console.log("ABSENSI_RESULT DITERIMA:", data);
-
-    saveResult(data);
-    showResult(data);
-
-    if(data.duplicate){
-        setStatus("⚠ Sudah absen", data.message || (data.nama + " sudah melakukan absensi."));
-    }else if(data.success){
-        setStatus("✓ Absensi berhasil", (data.nama || "Siswa") + (data.waktu ? " • " + data.waktu : ""));
-    }else{
-        setStatus("✕ Absensi gagal", data.message || "Data tidak dapat diproses.");
+    function esc(v) {
+        const d = document.createElement('div');
+        d.textContent = v == null ? '' : String(v);
+        return d.innerHTML;
     }
-}, false);
 
-/* ==========================================================
-   START CAMERA
-========================================================== */
-async function startScanner(facingMode){
-    currentFacingMode = facingMode || currentFacingMode;
-    clearError();
-    setStatus("Menyiapkan kamera...", "Mohon izinkan akses kamera.");
-    setLed(false);
+    // ============================================================
+    // RENDER HISTORY
+    // ============================================================
+    function renderHistory() {
+        const list = document.getElementById('historyList');
+        const count = document.getElementById('historyCount');
+        count.textContent = history.length + ' siswa';
 
-    try{
-        if(typeof Html5Qrcode === "undefined"){
-            throw new Error("Library scanner tidak tersedia.");
+        if (history.length === 0) {
+            list.innerHTML = '<div class="history-empty">Belum ada absensi hari ini.</div>';
+            return;
         }
 
-        if(qrScanner){
-            try{ await qrScanner.stop(); qrScanner.clear(); }catch(e){}
-            qrScanner = null;
+        list.innerHTML = history.map(item => `
+            <div class="history-item ${item.duplicate ? 'duplicate' : ''}">
+                <div class="h-nama">${esc(item.nama)}</div>
+                <div class="h-info">${esc(item.kelas || '')} • NISN: ${esc(item.nisn)}</div>
+                <div class="h-info">🕐 ${esc(item.waktu || '-')}</div>
+                <span class="h-badge">${item.duplicate ? '⚠ Sudah Absen' : '✅ Hadir'}</span>
+            </div>
+        `).join('');
+    }
+
+    // ============================================================
+    // STATUS
+    // ============================================================
+    function setStatus(text, detail) {
+        document.getElementById('status').textContent = text || '';
+        document.getElementById('detail').textContent = detail || '';
+    }
+
+    function setLed(on) {
+        const led = document.getElementById('statusLed');
+        const txt = document.getElementById('statusText');
+        led.className = 'status-led ' + (on ? 'on' : 'off');
+        txt.textContent = on ? 'Kamera menyala' : 'Kamera mati';
+    }
+
+    function showError(text) {
+        const el = document.getElementById('error');
+        el.textContent = text;
+        el.style.display = 'block';
+        document.getElementById('retry').style.display = 'block';
+    }
+
+    function clearError() {
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('retry').style.display = 'none';
+    }
+
+    // ============================================================
+    // RESULT
+    // ============================================================
+    function showResult(data) {
+        const box = document.getElementById('result');
+        box.className = 'result';
+
+        const icon = document.getElementById('resultIcon');
+        if (data.duplicate) {
+            box.classList.add('duplicate');
+            icon.textContent = '⚠️';
+        } else if (!data.success) {
+            box.classList.add('error');
+            icon.textContent = '❌';
+        } else {
+            box.classList.add('success');
+            icon.textContent = '✅';
         }
 
-        qrScanner = new Html5Qrcode("reader");
+        document.getElementById('resultName').textContent = data.nama || 'Siswa tidak ditemukan';
+        document.getElementById('resultClass').textContent = data.kelas ? 'Kelas ' + data.kelas : '';
+        document.getElementById('resultTime').textContent = data.waktu ? '🕐 ' + data.waktu : '';
+        document.getElementById('resultMessage').textContent = data.message || '';
+        box.style.display = 'block';
+    }
 
-        const config = {
-            fps: 15,
-            qrbox: function(width, height){
-                const size = Math.max(200, Math.floor(Math.min(width, height) * 0.7));
-                return { width: size, height: size };
-            }
+    // ============================================================
+    // SIMPAN HASIL
+    // ============================================================
+    function saveResult(data) {
+        if (!data || !data.nisn || !data.nama) return;
+
+        const nisn = String(data.nisn).trim();
+        const record = {
+            nisn: nisn,
+            nama: String(data.nama).trim(),
+            kelas: String(data.kelas || '').trim(),
+            waktu: String(data.waktu || '').trim(),
+            duplicate: !!data.duplicate
         };
 
-        await qrScanner.start(
-            { facingMode: facingMode || currentFacingMode },
-            config,
-            onScanSuccess,
-            function(){}
-        );
+        const idx = history.findIndex(item => String(item.nisn) === nisn);
+        if (idx >= 0) history[idx] = record;
+        else history.unshift(record);
 
-        const label = (facingMode === 'user' || currentFacingMode === 'user') ? 'Depan' : 'Belakang';
-        setStatus("Kamera " + label + " siap ✓", "Arahkan QR siswa ke kotak scanner.");
-        setLed(true);
-
-        // Kirim ready ke parent
-        try{
-            if(window.opener && !window.opener.closed){
-                window.opener.postMessage({ type: "ABSENSI_SCANNER_READY" }, "*");
-            }
-        }catch(e){}
-
-    }catch(error){
-        console.warn("Kamera error:", error);
-        showError("Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.");
-        setStatus("Kamera gagal dibuka", "Tekan Coba Lagi.");
-        setLed(false);
+        saveHistory();
+        renderHistory();
     }
-}
 
-/* ==========================================================
-   STOP SCANNER
-========================================================== */
-async function stopScanner(){
-    try{
-        if(qrScanner){
-            await qrScanner.stop();
-            qrScanner.clear();
+    // ============================================================
+    // AMBIL NISN DARI QR
+    // ============================================================
+    function getNisn(text) {
+        text = String(text || '').trim();
+        if (!text) return '';
+
+        try {
+            const url = new URL(text);
+            const nisn = url.searchParams.get('nisn') || url.searchParams.get('NISN');
+            if (nisn) return nisn.trim();
+        } catch (e) {}
+
+        return text;
+    }
+
+    // ============================================================
+    // KIRIM KE APLIKASI UTAMA (INDEX)
+    // ============================================================
+    function sendToIndex(nisn) {
+        if (!window.opener || window.opener.closed) {
+            showError('Aplikasi utama tidak terhubung. Tutup scanner dan buka dari tombol Scan QR.');
+            setStatus('Koneksi hilang', 'Tutup scanner dan buka ulang dari aplikasi.');
+            processing = false;
+            return false;
         }
-    }catch(e){}
-    qrScanner = null;
-    setStatus("Scanner dihentikan", "");
-    setLed(false);
-    document.getElementById("result").style.display = "none";
-}
 
-/* ==========================================================
-   EVENT TOMBOL
-========================================================== */
-document.getElementById("btnRear").addEventListener("click", function(){
-    currentFacingMode = 'environment';
-    startScanner('environment');
-});
+        try {
+            window.opener.postMessage({
+                type: 'ABSENSI_QR',
+                value: nisn,
+                time: Date.now()
+            }, '*');
+            console.log('✅ QR terkirim:', nisn);
+            return true;
+        } catch (e) {
+            console.error('Gagal kirim:', e);
+            showError('Gagal mengirim QR ke aplikasi utama.');
+            processing = false;
+            return false;
+        }
+    }
 
-document.getElementById("btnFront").addEventListener("click", function(){
-    currentFacingMode = 'user';
-    startScanner('user');
-});
+    // ============================================================
+    // SCAN SUCCESS
+    // ============================================================
+    function onScanSuccess(decodedText) {
+        if (processing) return;
 
-document.getElementById("btnStop").addEventListener("click", function(){
-    stopScanner();
-});
+        const nisn = getNisn(decodedText);
+        if (!nisn) {
+            console.warn('NISN tidak valid:', decodedText);
+            return;
+        }
 
-document.getElementById("retry").addEventListener("click", function(){
-    startScanner(currentFacingMode);
-});
+        const now = Date.now();
+        if (nisn === lastNisn && now - lastSendTime < 2000) return;
 
-/* ==========================================================
-   PARAMETER URL
-========================================================== */
-const urlParams = new URLSearchParams(window.location.search);
-const cameraParam = urlParams.get('camera');
-if(cameraParam === 'front'){
-    setTimeout(() => { currentFacingMode = 'user'; startScanner('user'); }, 300);
-}
+        lastNisn = nisn;
+        lastSendTime = now;
+        processing = true;
 
-/* ==========================================================
-   INIT
-========================================================== */
-renderHistory();
-setStatus("Menyiapkan kamera...", "Mohon izinkan akses kamera.");
+        clearError();
+        document.getElementById('result').style.display = 'none';
+        setStatus('QR terbaca ✅', 'Mengirim ke aplikasi utama...');
 
-// Cek dukungan kamera
-if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    showError("Browser tidak mendukung kamera. Gunakan Chrome terbaru.");
-    setStatus("Tidak didukung", "Browser tidak support kamera.");
-}else{
-    // Mulai otomatis (default kamera belakang)
-    setTimeout(() => { startScanner('environment'); }, 500);
-}
+        if (!sendToIndex(nisn)) return;
+
+        setStatus('Menunggu respon...', 'Aplikasi utama sedang memproses...');
+
+        clearTimeout(waitingTimer);
+        waitingTimer = setTimeout(() => {
+            if (!processing) return;
+            setStatus('Timeout ⏰', 'Aplikasi utama tidak merespon. Coba lagi.');
+            showError('Aplikasi utama tidak mengirim hasil. Tutup scanner dan buka ulang.');
+            processing = false;
+        }, 10000);
+    }
+
+    // ============================================================
+    // TERIMA HASIL DARI INDEX
+    // ============================================================
+    window.addEventListener('message', function(event) {
+        if (!event || !event.data) return;
+        if (event.data.type !== 'ABSENSI_RESULT') return;
+
+        clearTimeout(waitingTimer);
+        processing = false;
+
+        const data = event.data;
+        console.log('✅ Hasil absensi:', data);
+
+        saveResult(data);
+        showResult(data);
+
+        if (data.duplicate) {
+            setStatus('⚠ Sudah absen', data.message || data.nama + ' sudah absen.');
+        } else if (data.success) {
+            setStatus('✅ Absensi berhasil', (data.nama || 'Siswa') + (data.waktu ? ' • ' + data.waktu : ''));
+        } else {
+            setStatus('❌ Gagal', data.message || 'Data tidak valid.');
+        }
+    });
+
+    // ============================================================
+    // START SCANNER
+    // ============================================================
+    async function startScanner(mode) {
+        currentMode = mode || currentMode;
+        clearError();
+        setStatus('Menyiapkan kamera...', 'Mohon izinkan akses kamera.');
+        setLed(false);
+
+        try {
+            if (typeof Html5Qrcode === 'undefined') {
+                throw new Error('Library scanner tidak tersedia.');
+            }
+
+            if (qrScanner) {
+                try { await qrScanner.stop();
+                    qrScanner.clear(); } catch (e) {}
+                qrScanner = null;
+            }
+
+            qrScanner = new Html5Qrcode('reader');
+
+            const config = {
+                fps: 15,
+                qrbox: function(width, height) {
+                    const size = Math.max(200, Math.floor(Math.min(width, height) * 0.7));
+                    return { width: size, height: size };
+                }
+            };
+
+            await qrScanner.start({ facingMode: mode }, config, onScanSuccess, function() {});
+
+            const label = mode === 'user' ? 'Depan' : 'Belakang';
+            setStatus('Kamera ' + label + ' siap ✅', 'Arahkan QR ke kotak scanner.');
+            setLed(true);
+
+            // Kirim ready ke parent
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'ABSENSI_SCANNER_READY' }, '*');
+                }
+            } catch (e) {}
+
+        } catch (error) {
+            console.error('Kamera error:', error);
+            showError('Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.');
+            setStatus('Gagal buka kamera', 'Tekan "Coba Lagi"');
+            setLed(false);
+        }
+    }
+
+    // ============================================================
+    // STOP SCANNER
+    // ============================================================
+    async function stopScanner() {
+        try {
+            if (qrScanner) {
+                await qrScanner.stop();
+                qrScanner.clear();
+            }
+        } catch (e) {}
+        qrScanner = null;
+        setStatus('Scanner dihentikan', '');
+        setLed(false);
+        document.getElementById('result').style.display = 'none';
+    }
+
+    // ============================================================
+    // EVENT TOMBOL
+    // ============================================================
+    document.getElementById('btnRear').addEventListener('click', function() {
+        startScanner('environment');
+    });
+
+    document.getElementById('btnFront').addEventListener('click', function() {
+        startScanner('user');
+    });
+
+    document.getElementById('btnStop').addEventListener('click', function() {
+        stopScanner();
+    });
+
+    document.getElementById('retry').addEventListener('click', function() {
+        startScanner(currentMode);
+    });
+
+    // ============================================================
+    // PARAMETER URL
+    // ============================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('camera') === 'front') {
+        setTimeout(() => { startScanner('user'); }, 500);
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    renderHistory();
+    setStatus('Menyiapkan kamera...', 'Mohon izinkan akses kamera.');
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showError('Browser tidak mendukung kamera. Gunakan Chrome terbaru.');
+        setStatus('Tidak didukung', 'Browser tidak support kamera.');
+    } else {
+        // Auto start kamera belakang
+        setTimeout(() => { startScanner('environment'); }, 600);
+    }
 </script>
+
 </body>
 </html>
